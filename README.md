@@ -51,21 +51,6 @@ Two-stage processing (optional curation between): search theses.fr → explorato
 
 Workshop presentation materials.
 
-## Quick Start
-
-1. **Choose a pipeline:**
-   - Academic articles → **WPB_BIBLM**
-   - Doctoral theses → **WPB_TESIS**
-
-2. **Read the project README:**
-   - Install dependencies (listed there)
-   - Configure the YAML file
-   - Run the pipeline
-
-3. **For diagnostic help:**
-   - Each project includes scripts to verify API behavior and search parameters
-   - See the project README for details
-
 ## Python Requirements
 
 - **Python 3.8+**
@@ -79,15 +64,6 @@ Workshop presentation materials.
 | WPB_BIBLM | [OpenAlex](https://openalex.org) | CC0 | University of Arizona (National Science Foundation grant) |
 | WPB_TESIS | [theses.fr](https://theses.fr/) | Open Licence 2.0 | Agence Bibliographique de l'Enseignement Supérieur (Abes) |
 
-## Documentation Standards
-
-All scripts follow **Rule et al. (2019)**: *Ten Simple Rules for Writing and Sharing Computational Analyses in Jupyter Notebooks*. PLoS Comput Biol 15(7): e1007007. https://doi.org/10.1371/journal.pcbi.1007007
-
-Additional documentation:
-- Configuration files are extensively commented
-- Each pipeline includes diagnostic scripts to verify API behavior
-- Technical limits of data sources are documented alongside the code
-
 ## Structure & Conventions
 
 **One iteration per run:** Each pipeline run gets a unique identifier; outputs are never overwritten without explicit confirmation.
@@ -95,14 +71,6 @@ Additional documentation:
 **Configuration travels with results:** A copy of the YAML used is saved alongside every output (trazabilidad).
 
 **Paths are always relative:** Scripts resolve paths from the working directory, not from the script location. Always `cd` to the project folder before executing.
-
-## Questions or Issues?
-
-See the project-specific README for:
-- Platform-specific instructions (macOS, Linux, Windows)
-- Detailed metrics definitions
-- Known data limits and how they're measured
-- API field behavior documentation
 
 ## Related Work
 
