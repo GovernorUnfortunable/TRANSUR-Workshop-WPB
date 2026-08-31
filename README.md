@@ -33,7 +33,7 @@ Three-stage processing: extract articles by keyword → calculate annual metrics
 - **Source:** OpenAlex API (full-text search)
 - **Output:** Time series per keyword, co-authorship networks, publication type/open access distribution
 
-**→ See [WPB_BIBLM/README.md](./WPB_BIBLM/README.md) for usage**
+**→ See [WPB_BIBLM/README.md](./BIBLM_REPO/README.md) for usage**
 
 ### WPB_TESIS — Thesis Analysis Pipeline  
 
@@ -45,7 +45,7 @@ Two-stage processing (optional curation between): search theses.fr → explorato
 - **Source:** theses.fr API (titles, abstracts, committee metadata)
 - **Output:** Time series per search term, committee co-participation network, institutional rankings
 
-**→ See [WPB_TESIS/README.md](./WPB_TESIS/README.md) for usage**
+**→ See [WPB_TESIS/README.md](./TESIS_REPO/README.md) for usage**
 
 ### Slides
 
