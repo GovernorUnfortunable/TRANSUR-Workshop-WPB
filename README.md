@@ -49,7 +49,7 @@ Two-stage processing (optional curation between): search theses.fr → explorato
 
 ### Slides
 
-Workshop presentation materials. See `slides/README.md` for details.
+Workshop presentation materials.
 
 ## Quick Start
 
