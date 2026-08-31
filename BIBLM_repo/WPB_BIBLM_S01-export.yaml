@@ -1,0 +1,350 @@
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# WPB_BIBLM_S01 — Configuración de recuperación bibliométrica
+# Script: WPB_BIBLM_S01_export.py (v0.91)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#
+# COMO CORRER
+# ───────────
+# Requisitos: Python 3.8+ y las dependencias requests, pyyaml, nltk
+#
+# NLTK y su corpus de stopwords son OBLIGATORIOS. Si falta cualquiera de los
+# dos, el script aborta al arrancar con instrucciones de instalación. No hay
+# modo degradado: sin stopwords, la extracción de candidatos y el TF-IDF
+# producirían resultados no comparables con los de una corrida normal.
+#
+#   macOS / Linux:
+#     python3 -m pip install requests pyyaml nltk
+#     python3 -m nltk.downloader stopwords
+#     cd /ruta/al/proyecto
+#     python3 WPB_BIBLM_S01_export.py --config WPB_BIBLM_S01-export.yaml
+#
+#   Windows (PowerShell o CMD):
+#     py -m pip install requests pyyaml nltk
+#     py -m nltk.downloader stopwords
+#     cd C:\ruta\al\proyecto
+#     py -X utf8 WPB_BIBLM_S01_export.py --config WPB_BIBLM_S01_config.yaml
+#
+#   El flag -X utf8 es recomendado, no obligatorio: el log se escribe siempre
+#   en UTF-8 con independencia de la codificación del sistema. Sirve para que
+#   los acentos se vean bien también en pantalla.
+#
+#   Agregar --force para sobrescribir sin pedir confirmación.
+#
+# SOBRESCRITURA
+# ─────────────
+# Los nombres de archivo derivan de metadata.iteracion. Reejecutar con la
+# misma iteración PISA los resultados anteriores. El script los detecta,
+# los lista y pide confirmación; responder "n" aborta sin tocar nada.
+# Para conservar una corrida previa: subir metadata.iteracion.
+#
+# ARCHIVOS QUE GENERA
+# ───────────────────
+# En output.directorio, con prefijo WPB_BIBLM_{iteracion:03d}_
+#
+#   _v{N}.0.csv                     Corpus final, un registro por documento
+#   _KEYWORD_<kw>.csv               Corpus segmentado por palabra clave
+#   _IDS_KEYWORD_<kw>.txt           IDs OpenAlex por palabra clave
+#   _NUCLEO_<A|B|C>.csv             Corpus agregado por núcleo teórico
+#   _CANDIDATOS_sintetizado.csv     Términos emergentes con TF-IDF y criterios
+#   _ESTRATIFICACION_agregado.csv   % del corpus en cada allow list
+#   _ESTRATIFICACION_temporal.csv   Lo mismo, año por año
+#   _estadisticas_basicas.txt       Conteos de recuperación y exclusión
+#   _config_usado.yaml              Copia de este archivo (trazabilidad)
+#   _ejecucion.log                  Log; se acumula entre corridas
+#
+# RUTAS
+# ─────
+# output.directorio es relativo al directorio desde el que se ejecuta el
+# script, no a la ubicación del .py. Usar siempre barra normal (/), también
+# en Windows: la barra invertida se lee como escape en YAML.
+#
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+metadata:
+  iteracion: 0  # Prefijo de todos los outputs. Subirlo preserva la corrida anterior.
+  descripcion: "TRANSUR Work Package B — Análisis de circulación académica decolonial"
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# API (OpenAlex)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+api:
+  base_url: https://api.openalex.org
+  per_page: 200
+  max_resultados_por_keyword: 30000  # Techo por palabra clave
+
+  rate_limit_delay: 0.1  # Segundos entre llamadas. Sin api_key, subir a 0.5+
+  api_key: ""  # Opcional: aumenta el límite 10x
+  mailto: ""            # Opcional: identifica al solicitante usando email
+
+  reintentos:
+    max_intentos: 3
+    backoff_base: 2  # Espera exponencial: 2s, 4s, 8s
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# FILTROS DE BÚSQUEDA
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# Se aplican en la consulta a la API, salvo el filtro por dominio, que es
+# local: el script conserva solo registros cuyo primary_topic.domain sea
+# "Social Sciences" (OpenAlex no permite filtrar por dominio en /works).
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+filtros:
+  periodo_inicio: 1960
+  periodo_fin: 2026
+
+  paises_afiliacion: [FR, DE]  # Afiliación institucional de autores (ISO-2)
+
+  tipos_documento:
+    - article
+    - book
+    - book-chapter
+    - preprint
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# ALLOW LISTS — Filtrado por listas de fuentes
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# Se aplica localmente, después de recuperar y deduplicar.
+#
+#   filtrar_por_allow_lists: false → recupera todo, sin filtro
+#   filtrar_por_allow_lists: true  → conserva solo documentos que estén en
+#                                    AL MENOS UNA lista con incluir: true (OR)
+#
+# ALCANCE: el corpus filtrado alimenta TODO el pipeline posterior — extracción
+# de candidatos, TF-IDF y criterios A-E. No es solo una vista de exportación.
+# Las métricas no son comparables entre corridas con distinto filtro.
+#
+# Documentación de las listas: https://help.openalex.org/data/sources
+#   doaj, core                 → campos documentados por OpenAlex
+#   high_oa_rate, scielo, ojs  → campos existentes pero NO documentados;
+#                                presencia verificada empíricamente en el
+#                                corpus exportado (2026-08)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+filtrar_por_allow_lists: true
+
+allow_lists:
+  doaj:
+    incluir: true
+    descripcion: "Directory of Open Access Journals"
+
+  core:
+    incluir: true
+    descripcion: "CWTS Core sources (Leiden Ranking)"
+
+  high_oa_rate:
+    incluir: false
+    descripcion: "Fuentes con alta tasa Open Access (NO DOCUMENTADO)"
+
+  scielo:
+    incluir: true
+    descripcion: "SciELO repositories (NO DOCUMENTADO)"
+
+  ojs:
+    incluir: true
+    descripcion: "Open Journal Systems instances (NO DOCUMENTADO)"
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# ESTRATIFICACIÓN DE FUENTES
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# Reporta qué proporción del corpus pertenece a cada allow list.
+#
+# Se calcula ANTES del filtro de allow lists, sobre el corpus completo
+# post-dominio. Calcularla después daría 100% por construcción en las
+# listas activas.
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+estratificacion_fuentes:
+  habilitado: true
+  incluir:
+    - doaj
+    - core
+    - high_oa_rate
+    - scielo
+    - ojs
+  reportar_por:
+    - agregado   # Total del período completo
+    - temporal   # Año por año
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# EXTRACCIÓN DE CANDIDATOS (términos emergentes)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+extraccion_candidatos:
+  bigramas:
+    incluir: true  # false = solo unigramas
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# CRITERIOS DE EVALUACIÓN DE CANDIDATOS
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# Cada criterio evalúa si un término tiene circulación suficiente para
+# considerarse candidato. Se reportan en _CANDIDATOS_sintetizado.csv
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+criterios_candidatos:
+  criterio_a_autor:
+    habilitado: true
+    umbral: 2  # Apariciones del término en un mismo autor
+
+  criterio_b_fuente:
+    habilitado: true
+    umbral: 3  # Apariciones en una misma fuente (journal)
+
+  criterio_c_institucion:
+    habilitado: true
+    umbral: 3  # Apariciones en una misma institución
+
+  criterio_d_anual:
+    habilitado: true
+    umbral: 3  # Usos en al menos un año
+
+  criterio_e_pais_temporal:
+    habilitado: true
+    umbral: 3  # Cantidad de años distintos con uso activo
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# ENTRADA Y SALIDA
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# El diccionario de palabras clave debe tener estas columnas:
+#   Obligatorias: keyword, tipo_busqueda, nucleo
+#   Opcionales:   seleccionado (0 excluye la fila), sinonimo_1 ... sinonimo_10
+#
+# El script detecta el separador (coma, tabulación o punto y coma) y lo deja
+# anotado en el log. Si no es coma, avisa: conviene reexportar como CSV
+# delimitado por comas, sobre todo si algún término contiene comas.
+#
+# COLUMNA tipo_busqueda (v0.91)
+# ─────────────────────────────
+# Controla el parámetro de búsqueda que se envía a la API de OpenAlex.
+# Valores válidos:
+#
+#   search        Búsqueda con stemming. Las frases se encierran entre
+#                 comillas para tratarlas como expresión, pero el stemming
+#                 aplica después: "decolonial" puede devolver "decoloniality".
+#
+#   search.exact  Sin stemming ni variantes morfológicas. Solo devuelve
+#                 documentos que contengan la cadena exacta.
+#
+# Referencia: developers.openalex.org/guides/searching
+#
+# CÓMO ELEGIR (verificado con D02, corpus FR|DE 1960-2026)
+# ─────────────────────────────────────────────────────────
+# La elección depende de la naturaleza del término. Los conteos de referencia
+# son para FR|DE, período 1960-2026, tipos article/book/book-chapter/preprint:
+#
+#   Términos con prefijos/sufijos críticos ("decolonial"):
+#     El debate decolonial usa "de-" como prefijo de distanciamiento crítico.
+#     Sin restricción, el stemming conecta con "colonial", "colonialism", etc.,
+#     que tienen una literatura masiva anterior y distinta.
+#     search:  11.386 | search.exact:  9.891
+#     → Usar search (las comillas ya restringen la frase).
+#
+#   Términos novedosos de baja frecuencia ("conviviality", "pluriverso"):
+#     search sin comillas == search con comillas. El stemming no introduce
+#     ruido porque el término tiene poco uso fuera del debate que buscamos.
+#     → Cualquier modo es válido; usar search por consistencia.
+#
+#   Palabras con usos en otras lenguas ("quilombo"):
+#     En portugués coloquial "quilombo" significa "lío". El stemming conecta
+#     con ese uso: search sin comillas devuelve 129.524; search.exact: 711.
+#     → Usar search.exact para aislar el debate quilombola.
+#
+#   Frases técnicas multipalabra ("teoría de la dependencia"):
+#     Sin comillas, cada término compite por separado contra su frecuencia
+#     de uso aislada ("teoría", "dependencia" son palabras comunes).
+#     search sin comillas: 38 | search con comillas: 782 | search.exact: 728
+#     → Usar search.exact o search; ambos dan resultados similares.
+#
+# search.semantic NO está implementado: en la verificación del 2026-08-26
+# el endpoint devolvió errores 504/429 sistemáticos. Se registra un WARNING
+# y se cae a 'search' si se declara ese valor.
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+diccionario_palabras_clave: palabras_clave_biblm.csv
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# CAMPOS OPCIONALES (v0.8)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# Columnas adicionales del objeto Work de OpenAlex, apagadas por defecto.
+# Con el bloque entero ausente, el corpus es idéntico al de v0.7.
+#
+# Documentación de los campos: https://help.openalex.org/hc/en-us/articles/
+#   → "Attributes – Works". Los cinco están DOCUMENTADOS (2026-08-12).
+#
+# Un valor no reconocido aborta la ejecución con el listado de válidos; no
+# se cae a un default silencioso.
+#
+# ── referenced_works ───────────────────────────────────────────────────────
+#   ids_only          W1234|W5678
+#   ids_author_year   W1234~Smith~2019|W5678~Nowak~2020~xpac|W9999
+#                     ~ une id, primer autor y año;  | separa referencias
+#                     Sin autor -> 's.a.'; sin año -> 's.f.'
+#   count_only        columna n_referenced_works (entero)
+#   none              no se exporta
+#
+#   TRES FORMAS POSIBLES en ids_author_year, según el número de componentes:
+#     3 componentes   resuelta en el corpus core
+#     4 componentes   resuelta en el expansion corpus (sufijo ~xpac)
+#     1 componente    el ID ya no existe en OpenAlex (referencia colgada:
+#                     el citante no se actualiza cuando el citado se elimina
+#                     del índice). No hay forma de recuperarlas; el ID sigue
+#                     sirviendo para acoplamiento bibliográfico y cocitación.
+#   En la corrida del 2026-08-26 fueron 92% / 1,3% / 6,9% de 160.778 works.
+#
+#   VOLUMEN. Un artículo de ciencias sociales referencia del orden de 30-60
+#   works. La columna puede superar los 2.000 caracteres por fila y multiplicar
+#   varias veces el peso del CSV. count_only da el conteo sin ese costo.
+#
+#   COSTO EN CRÉDITOS (solo ids_author_year). OpenAlex devuelve en
+#   referenced_works únicamente identificadores: autor y año NO viajan en el
+#   objeto Work y hay que consultarlos aparte. El script lo hace después del
+#   filtro de allow lists, deduplicando los IDs de todo el corpus y
+#   consultando en lotes de 50, en DOS pasadas: la primera con el corpus por
+#   defecto, la segunda con corpus=all sobre los que quedaron pendientes.
+#   Medido: 5.549 documentos -> 160.778 works distintos -> ~3.480 consultas,
+#   unos 45 minutos. Las cuentas gratuitas de OpenAlex disponen de 1 USD/día.
+#   El log informa cuántas consultas hará ANTES de empezar.
+#
+#   Desde v0.9 los CSV se escriben ANTES de esta resolución, así que un fallo
+#   aquí no cuesta la descarga. Lo pendiente se completa después con
+#   WPB_BIBLM_S01b_completar_refs.py, sin volver a descargar nada.
+#
+# ── funders ────────────────────────────────────────────────────────────────
+#   Se leen de `awards`. Un work sin financiación declarada da campo vacío.
+#   ids_only          F1234|F5678
+#   ids_and_names     F1234~"National Science Foundation"|F5678~"..."
+#   count_only        columna n_funders (entero)
+#   none              no se exporta
+#   Sin costo adicional: viajan en la respuesta de /works.
+#
+# ── has_content ────────────────────────────────────────────────────────────
+#   Una columna con los formatos descargables: "pdf", "grobid_xml",
+#   "pdf|grobid_xml", o vacío si no hay ninguno.
+#
+# ── has_fulltext ───────────────────────────────────────────────────────────
+#   Booleano. True si existe cualquier formato descargable.
+#
+# ── indexed_in ─────────────────────────────────────────────────────────────
+#   Cuatro columnas booleanas, una por valor posible del campo:
+#     is_indexed_in_arxiv, is_indexed_in_crossref,
+#     is_indexed_in_doaj,  is_indexed_in_pubmed
+#   NOTA: is_indexed_in_doaj (indexación del WORK) no es lo mismo que
+#   is_in_doaj de las allow lists (propiedad de la FUENTE). Pueden discrepar.
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+campos_opcionales:
+  referenced_works:
+    incluir: none  # ids_only | ids_author_year | count_only | none
+
+  funders:
+    incluir: none  # ids_only | ids_and_names | count_only | none
+
+  has_content:
+    incluir: false  # true | false
+
+  has_fulltext:
+    incluir: false  # true | false
+
+  indexed_in:
+    incluir: false  # true | false
+
+output:
+  directorio: output
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# FIN DE CONFIGURACIÓN
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

@@ -1,0 +1,402 @@
+openapi: 3.0.1
+info:
+  title: API exportation des métadonnées de theses.fr
+  description: Cette API permet d’exporter les métadonnées descriptives d’une thèse
+    soutenue ou d’une thèse en préparation aux formats XML ou RDF ainsi que la référence
+    bibliographique d’une thèse soutenue ou d’une thèse en préparation aux formats
+    RIS et BibTeX.
+  version: "1.0"
+servers:
+- url: https://theses.fr
+paths:
+  /api/v1/outils/algoTheses:
+    get:
+      tags:
+      - outils-controller
+      operationId: algoTheses
+      parameters:
+      - name: etat
+        in: query
+        description: "Code du problème, multivalué possible"
+        required: false
+        schema:
+          type: array
+          items:
+            type: integer
+            format: int32
+        example: 52
+      - name: type
+        in: query
+        description: "Type d'intervention, multivalué possible"
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+        example: amelioration
+      - name: codeEtab
+        in: query
+        description: Code de l'établissement
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+        example: NICE
+      - name: nnt
+        in: query
+        description: Numéro national de thèse
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+        example: 2020MONT1234
+      - name: ppn
+        in: query
+        description: Identifiant de la notice
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+        example: 236863509
+      - name: utilisateur
+        in: query
+        description: Type d'utilisateur
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+        example: reseau
+      - name: rcr
+        in: query
+        description: Identifiant de la bibliothèque
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+        example: 751052105
+      - name: sort
+        in: query
+        description: Ordre de tri avec noms du (ou des) champ(s)
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+        example: "type,codeEtab,ppn"
+      - name: annee
+        in: query
+        description: Année de soutenance
+        required: false
+        schema:
+          type: string
+        example: 1985
+      - name: rownum
+        in: query
+        description: Nombre de lignes à renvoyer
+        required: false
+        schema:
+          type: string
+        example: 1000
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/export/{nntOuNumsujet}.xml:
+    get:
+      tags:
+      - redirection-controller
+      summary: "Url pour maintenir la compatibilité avec les urls de theses.fr v1,\
+        \ redirige sur l'API au format d'url standard."
+      description: "Url pour maintenir la compatibilité avec les urls de theses.fr\
+        \ v1, redirige sur l'API au format d'url standard."
+      operationId: redirectXML
+      parameters:
+      - name: nntOuNumsujet
+        in: path
+        description: Numéro National de Thèse ou numéro de sujet
+        required: true
+        schema:
+          type: string
+        example: 2013MON30092
+      responses:
+        "200":
+          description: Opération terminée avec succès
+        "400":
+          description: Le format du numéro national de thèse fourni est incorrect
+        "500":
+          description: Service indisponible
+  /api/v1/export/{nntOuNumsujet}.tefudoc:
+    get:
+      tags:
+      - redirection-controller
+      summary: "Url pour maintenir la compatibilité avec les urls de theses.fr v1,\
+        \ redirige sur l'API au format d'url standard."
+      description: "Url pour maintenir la compatibilité avec les urls de theses.fr\
+        \ v1, redirige sur l'API au format d'url standard."
+      operationId: redirectTefudoc
+      parameters:
+      - name: nntOuNumsujet
+        in: path
+        description: Numéro National de Thèse ou numéro de sujet
+        required: true
+        schema:
+          type: string
+        example: 2013MON30092
+      responses:
+        "200":
+          description: Opération terminée avec succès
+        "400":
+          description: Le format du numéro national de thèse fourni est incorrect
+        "500":
+          description: Service indisponible
+  /api/v1/export/{nntOuNumsujet}.ris:
+    get:
+      tags:
+      - redirection-controller
+      summary: "Url pour maintenir la compatibilité avec les urls de theses.fr v1,\
+        \ redirige sur l'API au format d'url standard."
+      description: "Url pour maintenir la compatibilité avec les urls de theses.fr\
+        \ v1, redirige sur l'API au format d'url standard."
+      operationId: redirectRis
+      parameters:
+      - name: nntOuNumsujet
+        in: path
+        description: Numéro National de Thèse ou numéro de sujet
+        required: true
+        schema:
+          type: string
+        example: 2013MON30092
+      responses:
+        "200":
+          description: Opération terminée avec succès
+        "400":
+          description: Le format du numéro national de thèse fourni est incorrect
+        "500":
+          description: Service indisponible
+  /api/v1/export/{nntOuNumsujet}.rdf:
+    get:
+      tags:
+      - redirection-controller
+      summary: "Url pour maintenir la compatibilité avec les urls de theses.fr v1,\
+        \ redirige sur l'API au format d'url standard."
+      description: "Url pour maintenir la compatibilité avec les urls de theses.fr\
+        \ v1, redirige sur l'API au format d'url standard."
+      operationId: redirectRDF
+      parameters:
+      - name: nntOuNumsujet
+        in: path
+        description: Numéro National de Thèse ou numéro de sujet
+        required: true
+        schema:
+          type: string
+        example: 2013MON30092
+      responses:
+        "200":
+          description: Opération terminée avec succès
+        "400":
+          description: Le format du numéro national de thèse fourni est incorrect
+        "500":
+          description: Service indisponible
+  /api/v1/export/{nntOuNumsujet}.bib:
+    get:
+      tags:
+      - redirection-controller
+      summary: "Url pour maintenir la compatibilité avec les urls de theses.fr v1,\
+        \ redirige sur l'API au format d'url standard."
+      description: "Url pour maintenir la compatibilité avec les urls de theses.fr\
+        \ v1, redirige sur l'API au format d'url standard."
+      operationId: redirectBib
+      parameters:
+      - name: nntOuNumsujet
+        in: path
+        description: Numéro National de Thèse ou numéro de sujet
+        required: true
+        schema:
+          type: string
+        example: 2013MON30092
+      responses:
+        "200":
+          description: Opération terminée avec succès
+        "400":
+          description: Le format du numéro national de thèse fourni est incorrect
+        "500":
+          description: Service indisponible
+  /api/v1/export/xml/{nntOuNumsujet}:
+    get:
+      tags:
+      - export-controller
+      summary: Retourne les métadonnées de la thèse sous format RDF.
+      description: Retourne les métadonnées de la thèse sous format RDF.
+      operationId: exportXML
+      parameters:
+      - name: nntOuNumsujet
+        in: path
+        description: Numéro National de Thèse ou numéro de sujet
+        required: true
+        schema:
+          type: string
+        example: 2013MON30092
+      responses:
+        "200":
+          description: Opération terminée avec succès
+          content:
+            application/xml:
+              schema:
+                type: string
+        "400":
+          description: Le format du numéro national de thèse fourni est incorrect
+          content:
+            application/xml:
+              schema:
+                type: string
+        "500":
+          description: Service indisponible
+          content:
+            application/xml:
+              schema:
+                type: string
+  /api/v1/export/tefudoc/{nntOuNumsujet}:
+    get:
+      tags:
+      - export-controller
+      summary: Retourne les métadonnées de la thèse sous format tefudoc.
+      description: Retourne les métadonnées de la thèse sous format tefudoc.
+      operationId: exportTefudoc
+      parameters:
+      - name: nntOuNumsujet
+        in: path
+        description: Numéro National de Thèse ou numéro de sujet
+        required: true
+        schema:
+          type: string
+        example: 2013MON30092
+      responses:
+        "200":
+          description: Opération terminée avec succès
+          content:
+            application/xml:
+              schema:
+                type: string
+        "400":
+          description: Le format du numéro national de thèse fourni est incorrect
+          content:
+            application/xml:
+              schema:
+                type: string
+        "500":
+          description: Service indisponible
+          content:
+            application/xml:
+              schema:
+                type: string
+  /api/v1/export/ris/{nntOuNumsujet}:
+    get:
+      tags:
+      - export-controller
+      summary: Retourne les métadonnées de la thèse dans un fichier ris.
+      description: Retourne les métadonnées de la thèse dans un fichier ris.
+      operationId: exportRis
+      parameters:
+      - name: nntOuNumsujet
+        in: path
+        description: Numéro National de Thèse ou numéro de sujet
+        required: true
+        schema:
+          type: string
+        example: 2013MON30092
+      responses:
+        "200":
+          description: Opération terminée avec succès
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Le format du numéro national de thèse fourni est incorrect
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: Service indisponible
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/export/rdf/{nntOuNumsujet}:
+    get:
+      tags:
+      - export-controller
+      summary: Retourne les métadonnées de la thèse sous format RDF.
+      description: Retourne les métadonnées de la thèse sous format RDF.
+      operationId: exportRDF
+      parameters:
+      - name: nntOuNumsujet
+        in: path
+        description: Numéro National de Thèse ou numéro de sujet
+        required: true
+        schema:
+          type: string
+        example: 2013MON30092
+      responses:
+        "200":
+          description: Opération terminée avec succès
+          content:
+            application/xml:
+              schema:
+                type: string
+        "400":
+          description: Le format du numéro national de thèse fourni est incorrect
+          content:
+            application/xml:
+              schema:
+                type: string
+        "500":
+          description: Service indisponible
+          content:
+            application/xml:
+              schema:
+                type: string
+  /api/v1/export/bib/{nntOuNumsujet}:
+    get:
+      tags:
+      - export-controller
+      summary: Retourne les métadonnées de la thèse dans un fichier bibtex.
+      description: Retourne les métadonnées de la thèse dans un fichier bibtex.
+      operationId: exportBib
+      parameters:
+      - name: nntOuNumsujet
+        in: path
+        description: Numéro National de Thèse ou numéro de sujet
+        required: true
+        schema:
+          type: string
+        example: 2013MON30092
+      responses:
+        "200":
+          description: Opération terminée avec succès
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Le format du numéro national de thèse fourni est incorrect
+          content:
+            '*/*':
+              schema:
+                type: string
+        "500":
+          description: Service indisponible
+          content:
+            '*/*':
+              schema:
+                type: string
+components: {}

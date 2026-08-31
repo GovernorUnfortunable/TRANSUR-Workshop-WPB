@@ -1,0 +1,1273 @@
+openapi: 3.0.1
+info:
+  title: API recherche de theses.fr
+  description: Cette API permet de lancer une recherche dans les données de theses.fr
+    décrivant les thèses et les personnes liées aux thèses. Les données sont récupérables
+    au format JSON.
+  version: "1.0"
+servers:
+- url: https://theses.fr
+paths:
+  /api/v1/theses/these/signaler/:
+    post:
+      tags:
+      - these-controller
+      summary: Signaler une erreur sur une page de these
+      description: "Envoie un mail à l'établissement concerné, avec les informations\
+        \ saisies dans le formulaire"
+      operationId: signalerErreur
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignalerErreurDto'
+        required: true
+      responses:
+        "200":
+          description: Opération terminée avec succès
+          content:
+            '*/*':
+              schema:
+                type: string
+        "503":
+          description: Service indisponible
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Mauvaise requête
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/theses/these/{id}:
+    get:
+      tags:
+      - these-controller
+      summary: Renvoyer une thèse à partir de son nnt
+      description: Retourne la thèse correspondante au nnt
+      operationId: getThese
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Opération terminée avec succès
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/TheseResponseDto'
+        "503":
+          description: Service indisponible
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/TheseResponseDto'
+        "400":
+          description: Mauvaise requête
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/TheseResponseDto'
+  /api/v1/theses/statsTheses:
+    get:
+      tags:
+      - search-theses-controller
+      summary: Retourne le nombre de theses soutenues
+      operationId: statsTheses
+      responses:
+        "200":
+          description: Opération terminée avec succès
+          content:
+            '*/*':
+              schema:
+                type: integer
+                format: int64
+        "503":
+          description: Service indisponible
+          content:
+            '*/*':
+              schema:
+                type: integer
+                format: int64
+        "400":
+          description: Mauvaise requête
+          content:
+            '*/*':
+              schema:
+                type: integer
+                format: int64
+  /api/v1/theses/statsSujets:
+    get:
+      tags:
+      - search-theses-controller
+      summary: Retourne le nombre de theses en préparation
+      operationId: statsSujets
+      responses:
+        "200":
+          description: Opération terminée avec succès
+          content:
+            '*/*':
+              schema:
+                type: integer
+                format: int64
+        "503":
+          description: Service indisponible
+          content:
+            '*/*':
+              schema:
+                type: integer
+                format: int64
+        "400":
+          description: Mauvaise requête
+          content:
+            '*/*':
+              schema:
+                type: integer
+                format: int64
+  /api/v1/theses/rss:
+    get:
+      tags:
+      - search-theses-controller
+      operationId: rss
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/View'
+  /api/v1/theses/rechercheCSV:
+    get:
+      tags:
+      - search-theses-controller
+      summary: Rechercher une thèse via le titre et exporter le résultat dans un fichier
+        CSV
+      description: Retourne une liste de thèses correspondant à la recherche au format
+        CSV
+      operationId: simpleToCSV
+      parameters:
+      - name: q
+        in: query
+        description: chaine à rechercher
+        required: true
+        schema:
+          type: string
+        example: technologie
+      - name: tri
+        in: query
+        description: Type de tri
+        required: false
+        schema:
+          type: string
+        example: "dateAsc, dateDesc, auteursAsc, auteursDesc, disciplineAsc, discplineDesc"
+      - name: filtres
+        in: query
+        description: filtres
+        required: false
+        schema:
+          type: string
+        example: "[discipline=\"arts (histoire, theorie, pratique)\"&discipline=\"\
+          etudes germaniques\"&discipline=\"architecture\"&langues=\"fr\"]"
+      responses:
+        "200":
+          description: Opération terminée avec succès
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+        "503":
+          description: Service indisponible
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+        "400":
+          description: Mauvaise requête
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+  /api/v1/theses/recherche/:
+    get:
+      tags:
+      - search-theses-controller
+      summary: Rechercher une thèse via le titre
+      description: Retourne une liste de thèses correspondant à la recherche
+      operationId: simple
+      parameters:
+      - name: q
+        in: query
+        description: chaine à rechercher
+        required: true
+        schema:
+          type: string
+        example: technologie
+      - name: debut
+        in: query
+        description: indice de la première thèse du lot
+        required: false
+        schema:
+          type: integer
+          format: int32
+        example: 10
+      - name: nombre
+        in: query
+        description: nombre de thèse du lot
+        required: false
+        schema:
+          type: integer
+          format: int32
+        example: 10
+      - name: tri
+        in: query
+        description: Type de tri
+        required: false
+        schema:
+          type: string
+        example: "dateAsc, dateDesc, auteursAsc, auteursDesc, disciplineAsc, discplineDesc"
+      - name: filtres
+        in: query
+        description: filtres
+        required: false
+        schema:
+          type: string
+        example: "[discipline=\"arts (histoire, theorie, pratique)\"&discipline=\"\
+          etudes germaniques\"&discipline=\"architecture\"&langues=\"fr\"]"
+      responses:
+        "200":
+          description: Opération terminée avec succès
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ResponseTheseLiteDto'
+        "503":
+          description: Service indisponible
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ResponseTheseLiteDto'
+        "400":
+          description: Mauvaise requête
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ResponseTheseLiteDto'
+  /api/v1/theses/organisme/{ppn}:
+    get:
+      tags:
+      - search-theses-controller
+      summary: Rechercher toutes les thèses liées à un établissement/organisme
+      description: "Retourne une liste de thèses correspondant liées à un établissement,\
+        \ groupées par rôle de l'établissement"
+      operationId: rechercheParOrganisme
+      parameters:
+      - name: ppn
+        in: path
+        description: PPN de l'établissement/organisme
+        required: true
+        schema:
+          type: string
+        example: 241345251
+      responses:
+        "200":
+          description: Opération terminée avec succès
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ThesesByOrganismeResponseDto'
+        "503":
+          description: Service indisponible
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ThesesByOrganismeResponseDto'
+        "400":
+          description: Mauvaise requête
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ThesesByOrganismeResponseDto'
+  /api/v1/theses/getorganismename/{ppn}:
+    get:
+      tags:
+      - search-theses-controller
+      summary: Obtenir le nom d'un organisme
+      description: "Retourne le nom d'un organisme. Si ce nom est vide, alors ce PPN\
+        \ ne correspond pas à un organisme, mais à une personne."
+      operationId: isOrganisme
+      parameters:
+      - name: ppn
+        in: path
+        description: PPN de l'établissement/organisme
+        required: true
+        schema:
+          type: string
+        example: 241345251
+      responses:
+        "200":
+          description: Opération terminée avec succès
+          content:
+            '*/*':
+              schema:
+                type: string
+        "503":
+          description: Service indisponible
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Mauvaise requête
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/theses/facets/:
+    get:
+      tags:
+      - search-theses-controller
+      summary: Retourne une liste de facets/filtres pour une recherche simple
+      operationId: facets
+      parameters:
+      - name: q
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: filtres
+        in: query
+        description: filtres
+        required: false
+        schema:
+          type: string
+        example: "[discipline=\"arts (histoire, theorie, pratique)\"&discipline=\"\
+          etudes germaniques\"&discipline=\"architecture\"&langues=\"fr\"]"
+      responses:
+        "200":
+          description: Opération terminée avec succès
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Facet'
+        "503":
+          description: Service indisponible
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Facet'
+        "400":
+          description: Mauvaise requête
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Facet'
+  /api/v1/theses/completion/:
+    get:
+      tags:
+      - search-theses-controller
+      summary: "Proposer l'automcompletion basée sur les mots clés libres, les mots\
+        \ clés rameau et la discipline"
+      description: Retourne 10 propositions
+      operationId: completion
+      parameters:
+      - name: q
+        in: query
+        description: début de la chaine à rechercher
+        required: true
+        schema:
+          type: string
+        example: indus
+      responses:
+        "200":
+          description: Opération terminée avec succès
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+        "503":
+          description: Service indisponible
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+        "400":
+          description: Mauvaise requête
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/v1/theses/checkNNT/{numSujet}:
+    get:
+      tags:
+      - these-controller
+      summary: Renvoyer le NNT d'une thèse à partir de son numSujet
+      description: "Si le numSujet (idStep) correspond également à une thèse soutenue\
+        \ et validée dans STAR, renvoi le NNT correspondant"
+      operationId: getNntIfExist
+      parameters:
+      - name: numSujet
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Opération terminée avec succès
+          content:
+            '*/*':
+              schema:
+                type: string
+        "503":
+          description: Service indisponible
+          content:
+            '*/*':
+              schema:
+                type: string
+        "400":
+          description: Mauvaise requête
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/v1/tests/personnes/recherche:
+    get:
+      tags:
+      - personne-test-controller
+      summary: Rechercher une personne avec un mot
+      description: Retourne une liste de personnes correspondant à la recherche
+      operationId: recherche
+      parameters:
+      - name: q
+        in: query
+        description: début de la chaine à rechercher
+        required: true
+        schema:
+          type: string
+        example: rousseau
+      - name: index
+        in: query
+        description: nom de l'index à réquêter
+        required: true
+        schema:
+          type: string
+        example: personnes
+      - name: filtres
+        in: query
+        description: filtres
+        required: false
+        schema:
+          type: string
+        example: "[role=\"auteurs\"&role=\"rapporteurs\"]"
+      - name: debut
+        in: query
+        description: indice de la première personne du lot
+        required: false
+        schema:
+          type: integer
+          format: int32
+        example: 10
+      - name: nombre
+        in: query
+        description: nombre de personne dans le lot
+        required: false
+        schema:
+          type: integer
+          format: int32
+        example: 10
+      - name: tri
+        in: query
+        description: Type de tri
+        required: false
+        schema:
+          type: string
+        example: "pertinence, PersonneDesc, PersonnesAsc"
+      responses:
+        "200":
+          description: Opération terminée avec succès
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RechercheResponseDto'
+        "503":
+          description: Service indisponible
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RechercheResponseDto'
+        "400":
+          description: Mauvaise requête
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RechercheResponseDto'
+      deprecated: true
+  /api/v1/tests/personnes/personne/{id}:
+    get:
+      tags:
+      - personne-test-controller
+      summary: Rechercher une personne par son identifiant
+      description: Retourne la personne correspondante à la recherche
+      operationId: rechercherParIdentifiant
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: index
+        in: query
+        description: nom de l'index à réquêter
+        required: true
+        schema:
+          type: string
+        example: personnes
+      responses:
+        "200":
+          description: Opération terminée avec succès
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PersonneResponseDto'
+        "503":
+          description: Service indisponible
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PersonneResponseDto'
+        "400":
+          description: Mauvaise requête
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PersonneResponseDto'
+      deprecated: true
+  /api/v1/tests/personnes/facets:
+    get:
+      tags:
+      - personne-test-controller
+      summary: Retourne une liste de facettes avec le nombre d'ocurence pour chaque
+        facette
+      description: Retourne une liste de facettes en fonction du critère de recherche
+      operationId: facets_1
+      parameters:
+      - name: q
+        in: query
+        description: début de la chaine à rechercher
+        required: true
+        schema:
+          type: string
+        example: rousseau
+      - name: index
+        in: query
+        description: nom de l'index à réquêter
+        required: true
+        schema:
+          type: string
+        example: personnes
+      - name: filtres
+        in: query
+        description: filtres
+        required: false
+        schema:
+          type: string
+        example: "[role=\"auteurs\"&role=\"rapporteurs\"]"
+      responses:
+        "200":
+          description: Opération terminée avec succès
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Facet'
+        "503":
+          description: Service indisponible
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Facet'
+        "400":
+          description: Mauvaise requête
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Facet'
+      deprecated: true
+  /api/v1/tests/personnes/completion:
+    get:
+      tags:
+      - personne-test-controller
+      summary: Proposer l'autocompletion basée sur les noms et prénoms
+      description: Retourne 10 propositions avec une priorité sur les personnes avec
+        un identifiant Idref
+      operationId: completion_1
+      parameters:
+      - name: q
+        in: query
+        description: début de la chaine à rechercher
+        required: true
+        schema:
+          type: string
+        example: indus
+      - name: index
+        in: query
+        description: nom de l'index à réquêter
+        required: true
+        schema:
+          type: string
+        example: personnes
+      responses:
+        "200":
+          description: Opération terminée avec succès
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SuggestionResponseDto'
+        "503":
+          description: Service indisponible
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SuggestionResponseDto'
+        "400":
+          description: Mauvaise requête
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SuggestionResponseDto'
+      deprecated: true
+  /api/v1/personnes/stats:
+    get:
+      tags:
+      - personne-controller
+      summary: Statistiques sur les personnes
+      description: Retourne le nombre total de personnes
+      operationId: getStatsPersonnes
+      responses:
+        "200":
+          description: Opération terminée avec succès
+          content:
+            '*/*':
+              schema:
+                type: integer
+                format: int64
+        "503":
+          description: Service indisponible
+          content:
+            '*/*':
+              schema:
+                type: integer
+                format: int64
+        "400":
+          description: Mauvaise requête
+          content:
+            '*/*':
+              schema:
+                type: integer
+                format: int64
+  /api/v1/personnes/recherche/:
+    get:
+      tags:
+      - personne-controller
+      summary: Rechercher une personne avec un mot
+      description: Retourne une liste de personnes correspondant à la recherche
+      operationId: recherche_1
+      parameters:
+      - name: q
+        in: query
+        description: début de la chaine à rechercher
+        required: true
+        schema:
+          type: string
+        example: rousseau
+      - name: filtres
+        in: query
+        description: filtres
+        required: false
+        schema:
+          type: string
+        example: "[role=\"auteurs\"&role=\"rapporteurs\"]"
+      - name: debut
+        in: query
+        description: indice de la première personne du lot
+        required: false
+        schema:
+          type: integer
+          format: int32
+        example: 10
+      - name: nombre
+        in: query
+        description: nombre de personne dans le lot
+        required: false
+        schema:
+          type: integer
+          format: int32
+        example: 10
+      - name: tri
+        in: query
+        description: Type de tri
+        required: false
+        schema:
+          type: string
+        example: "pertinence, PersonneDesc, PersonnesAsc"
+      responses:
+        "200":
+          description: Opération terminée avec succès
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RechercheResponseDto'
+        "503":
+          description: Service indisponible
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RechercheResponseDto'
+        "400":
+          description: Mauvaise requête
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RechercheResponseDto'
+  /api/v1/personnes/personne/{id}:
+    get:
+      tags:
+      - personne-controller
+      summary: Rechercher une personne par son identifiant
+      description: Retourne la personne correspondante à la recherche
+      operationId: rechercherParIdentifiant_1
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Opération terminée avec succès
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PersonneResponseDto'
+        "503":
+          description: Service indisponible
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PersonneResponseDto'
+        "400":
+          description: Mauvaise requête
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PersonneResponseDto'
+  /api/v1/personnes/facets:
+    get:
+      tags:
+      - personne-controller
+      summary: Retourne une liste de facettes avec le nombre d'ocurence pour chaque
+        facette
+      description: Retourne une liste de facettes en fonction du critère de recherche
+      operationId: facets_2
+      parameters:
+      - name: q
+        in: query
+        description: début de la chaine à rechercher
+        required: true
+        schema:
+          type: string
+        example: rousseau
+      - name: filtres
+        in: query
+        description: filtres
+        required: false
+        schema:
+          type: string
+        example: "[role=\"auteurs\"&role=\"rapporteurs\"]"
+      responses:
+        "200":
+          description: Opération terminée avec succès
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Facet'
+        "503":
+          description: Service indisponible
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Facet'
+        "400":
+          description: Mauvaise requête
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Facet'
+  /api/v1/personnes/completion:
+    get:
+      tags:
+      - personne-controller
+      summary: Proposer l'autocompletion basée sur les noms et prénoms
+      description: Retourne 10 propositions avec une priorité sur les personnes avec
+        un identifiant Idref
+      operationId: completion_2
+      parameters:
+      - name: q
+        in: query
+        description: début de la chaine à rechercher
+        required: true
+        schema:
+          type: string
+        example: indus
+      responses:
+        "200":
+          description: Opération terminée avec succès
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SuggestionResponseDto'
+        "503":
+          description: Service indisponible
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SuggestionResponseDto'
+        "400":
+          description: Mauvaise requête
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SuggestionResponseDto'
+components:
+  schemas:
+    SignalerErreurDto:
+      type: object
+      properties:
+        token:
+          type: string
+        url:
+          type: string
+        nom:
+          type: string
+        prenom:
+          type: string
+        mail:
+          type: string
+        domaine:
+          type: string
+        objet:
+          type: string
+        question:
+          type: string
+        appSource:
+          type: string
+        etabPpn:
+          type: string
+    OrganismeResponseDto:
+      type: object
+      properties:
+        ppn:
+          type: string
+        nom:
+          type: string
+        type:
+          type: string
+    SujetsToMap:
+      type: object
+      properties:
+        keyword:
+          type: string
+        type:
+          type: string
+          enum:
+          - sujet
+          - sujetsRameau
+        query:
+          type: string
+    ThesePersoneResponseDto:
+      type: object
+      properties:
+        ppn:
+          type: string
+        nom:
+          type: string
+        prenom:
+          type: string
+    TheseResponseDto:
+      type: object
+      properties:
+        titrePrincipal:
+          type: string
+        nnt:
+          type: string
+        doi:
+          type: string
+        numSujet:
+          type: string
+        dateSoutenance:
+          type: string
+        datePremiereInscriptionDoctorat:
+          type: string
+        discipline:
+          type: string
+        titres:
+          type: object
+          additionalProperties:
+            type: string
+        resumes:
+          type: object
+          additionalProperties:
+            type: string
+        etabSoutenance:
+          $ref: '#/components/schemas/OrganismeResponseDto'
+        codeEtab:
+          type: string
+        etabCotutelle:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganismeResponseDto'
+        partenairesRecherche:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganismeResponseDto'
+        mapSujets:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/SujetsToMap'
+        membresJury:
+          type: array
+          items:
+            $ref: '#/components/schemas/ThesePersoneResponseDto'
+        rapporteurs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ThesePersoneResponseDto'
+        auteurs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ThesePersoneResponseDto'
+        directeurs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ThesePersoneResponseDto'
+        langues:
+          type: array
+          items:
+            type: string
+        cas:
+          type: string
+        accessible:
+          type: string
+        ecolesDoctorales:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganismeResponseDto'
+        presidentJury:
+          $ref: '#/components/schemas/ThesePersoneResponseDto'
+        source:
+          type: string
+        status:
+          type: string
+        isSoutenue:
+          type: boolean
+    View:
+      type: object
+      properties:
+        contentType:
+          type: string
+    PersonneThese:
+      type: object
+      properties:
+        ppn:
+          type: string
+        nom:
+          type: string
+        prenom:
+          type: string
+    ResponseTheseLiteDto:
+      type: object
+      properties:
+        totalHits:
+          type: integer
+          format: int64
+        took:
+          type: integer
+          format: int64
+        theses:
+          type: array
+          items:
+            $ref: '#/components/schemas/TheseLiteResponseDto'
+    Sujet:
+      type: object
+      properties:
+        langue:
+          type: string
+        libelle:
+          type: string
+    SujetsRameau:
+      type: object
+      properties:
+        ppn:
+          type: string
+        libelle:
+          type: string
+    TheseLiteResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+        titrePrincipal:
+          type: string
+        titreEN:
+          type: string
+        etabSoutenanceN:
+          type: string
+        etabSoutenancePpn:
+          type: string
+        dateSoutenance:
+          type: string
+        datePremiereInscriptionDoctorat:
+          type: string
+        auteurs:
+          type: array
+          items:
+            $ref: '#/components/schemas/PersonneThese'
+        directeurs:
+          type: array
+          items:
+            $ref: '#/components/schemas/PersonneThese'
+        rapporteurs:
+          type: array
+          items:
+            $ref: '#/components/schemas/PersonneThese'
+        examinateurs:
+          type: array
+          items:
+            $ref: '#/components/schemas/PersonneThese'
+        president:
+          $ref: '#/components/schemas/PersonneThese'
+        nnt:
+          type: string
+        doi:
+          type: string
+        discipline:
+          type: string
+        status:
+          type: string
+        ecolesDoctorale:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganismeResponseDto'
+        partenairesDeRecherche:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganismeResponseDto'
+        sujets:
+          type: array
+          items:
+            $ref: '#/components/schemas/Sujet'
+        sujetsRameau:
+          type: array
+          items:
+            $ref: '#/components/schemas/SujetsRameau'
+    ThesesByOrganismeResponseDto:
+      type: object
+      properties:
+        totalHitsetabSoutenance:
+          type: integer
+          format: int64
+        etabSoutenance:
+          type: array
+          items:
+            $ref: '#/components/schemas/TheseLiteResponseDto'
+        totalHitsetabSoutenanceEnCours:
+          type: integer
+          format: int64
+        etabSoutenanceEnCours:
+          type: array
+          items:
+            $ref: '#/components/schemas/TheseLiteResponseDto'
+        totalHitspartenaireRecherche:
+          type: integer
+          format: int64
+        partenaireRecherche:
+          type: array
+          items:
+            $ref: '#/components/schemas/TheseLiteResponseDto'
+        totalHitspartenaireRechercheEnCours:
+          type: integer
+          format: int64
+        partenaireRechercheEnCours:
+          type: array
+          items:
+            $ref: '#/components/schemas/TheseLiteResponseDto'
+        totalHitsetabCotutelle:
+          type: integer
+          format: int64
+        etabCotutelle:
+          type: array
+          items:
+            $ref: '#/components/schemas/TheseLiteResponseDto'
+        totalHitsetabCotutelleEnCours:
+          type: integer
+          format: int64
+        etabCotutelleEnCours:
+          type: array
+          items:
+            $ref: '#/components/schemas/TheseLiteResponseDto'
+        totalHitsecoleDoctorale:
+          type: integer
+          format: int64
+        ecoleDoctorale:
+          type: array
+          items:
+            $ref: '#/components/schemas/TheseLiteResponseDto'
+        totalHitsecoleDoctoraleEnCours:
+          type: integer
+          format: int64
+        ecoleDoctoraleEnCours:
+          type: array
+          items:
+            $ref: '#/components/schemas/TheseLiteResponseDto'
+    Checkbox:
+      type: object
+      properties:
+        name:
+          type: string
+        label:
+          type: string
+        value:
+          type: integer
+          format: int64
+        parentName:
+          type: string
+    Facet:
+      type: object
+      properties:
+        name:
+          type: string
+        searchBar:
+          type: boolean
+        checkboxes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Checkbox'
+    PersonneLiteResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+        nom:
+          type: string
+        prenom:
+          type: string
+        has_idref:
+          type: boolean
+        roles:
+          type: object
+          additionalProperties:
+            type: integer
+            format: int32
+        theses:
+          type: array
+          items:
+            type: string
+        disciplines:
+          type: array
+          items:
+            type: string
+        etablissements:
+          type: array
+          items:
+            type: string
+    RechercheResponseDto:
+      type: object
+      properties:
+        totalHits:
+          type: integer
+          format: int64
+        took:
+          type: integer
+          format: int64
+        personnes:
+          type: array
+          items:
+            $ref: '#/components/schemas/PersonneLiteResponseDto'
+    PersonneResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+        nom:
+          type: string
+        prenom:
+          type: string
+        has_idref:
+          type: boolean
+        roles:
+          type: object
+          additionalProperties:
+            type: integer
+            format: int32
+        theses:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/TheseResponseDto'
+        mots_cles:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+    SuggestionPersonneResponseDto:
+      type: object
+      properties:
+        suggestion:
+          type: string
+        id:
+          type: string
+    SuggestionResponseDto:
+      type: object
+      properties:
+        personnes:
+          type: array
+          items:
+            $ref: '#/components/schemas/SuggestionPersonneResponseDto'
+        thematiques:
+          type: array
+          items:
+            $ref: '#/components/schemas/SuggestionPersonneResponseDto'

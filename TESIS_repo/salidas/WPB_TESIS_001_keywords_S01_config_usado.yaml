@@ -1,0 +1,640 @@
+# =========================================================================
+# WPB_TESIS_S01_busqueda.yaml  --  v0.1
+# =========================================================================
+#
+# Configuracion de la etapa S01 del pipeline WPB_TESIS.
+#
+# QUE HACE S01
+#   Corre UN diccionario de terminos contra la API de busqueda de theses.fr
+#   y emite una lista de candidatos para que una persona la revise. No
+#   recupera el corpus completo: eso es S02, y solo sobre lo validado.
+#
+# FLUJO
+#   S01 (este script)  ->  curacion manual  ->  S02
+#   S01 escribe un CSV con las columnas validado, motivo y notas vacias.
+#   La persona las rellena. S02 lee solo las filas con validado=1.
+#
+# COMO CORRER
+# ───────────
+# Requisitos: Python 3.8+ con requests, pyyaml
+#
+#   macOS / Linux:
+#     python3 -m pip install requests pyyaml
+#     cd /ruta/al/proyecto
+#     python3 WPB_TESIS_S01_busqueda.py --config WPB_TESIS_S01_busqueda.yaml
+#
+#   Windows (PowerShell o CMD):
+#     py -m pip install requests pyyaml
+#     cd C:\ruta\al\proyecto
+#     py -X utf8 WPB_TESIS_S01_busqueda.py --config WPB_TESIS_S01_busqueda.yaml
+#
+# Agregar --force para sobrescribir sin pedir confirmación.
+#
+# -X utf8 en Windows no es opcional: el corpus contiene caracteres franceses
+# y portugueses que cp1252, la codificación local, no representa.
+#
+# Un diccionario por corrida. Para procesar los tres, ejecutar tres veces
+# cambiando diccionario.tipo y diccionario.ruta, y fusionar los CSV por NNT.
+#
+# Antes de la primera corrida conviene correr los scripts de diagnóstico
+# WPB_TESIS_S00_diagnostico*.py, que verifican que la API sigue
+# comportándose como describe WPB_TESIS_limites_campos.md.
+#
+# DOCUMENTACION DE LA API
+#   Abes (2026). Le moteur de recherche theses.fr.
+#   https://documentation.abes.fr/aidethesesfr/index.html
+#   Campos interrogables:
+#   https://documentation.abes.fr/aidethesesfr/FR/co/LesChampsInterrogeables.html
+#
+# LIMITES VERIFICADOS DE LOS CAMPOS
+#   Ver WPB_TESIS_limites_campos.md. Contiene la tabla de que campos pliegan
+#   acentos, cuales lematizan y cuales respetan el orden de frase, con los
+#   datos que la sustentan y la fecha de verificacion (2026-08-29).
+#   Es lectura previa obligada antes de tocar campos_busqueda.
+#
+# LICENCIA DE LOS DATOS
+#   Licence Ouverte / Open Licence 2.0 (Etalab).
+#   Atribucion exigida en cualquier reutilizacion:
+#   "Agence bibliographique de l'enseignement superieur".
+#
+# NOTA SOBRE RUTAS
+#   Se escriben siempre con barra normal (/), tambien en Windows. La barra
+#   invertida se interpreta como escape en YAML y rompe la ruta (regla E.3).
+#   Las rutas relativas se resuelven contra el DIRECTORIO DE TRABAJO, no
+#   contra la ubicacion del .py (regla E.4).
+#
+# =========================================================================
+
+
+# -------------------------------------------------------------------------
+# metadata
+# -------------------------------------------------------------------------
+# La iteracion se declara AQUI y en ningun otro sitio del pipeline. S02 la
+# extrae del nombre de los archivos que recibe (regla C.6). No hay que
+# cambiarla en dos lugares ni mantenerlos sincronizados.
+#
+# Aparece en el nombre de todos los archivos de salida, de modo que dos
+# corridas con iteracion distinta no se pisan (regla C.5).
+metadata:
+  iteracion: "001"          # identificador de corrida. Cambiarlo antes de
+                            # una corrida nueva que no deba sobrescribir.
+  version_config: "0.6"     # debe coincidir con la del script (regla D.3)
+  proyecto: "TRANSUR / WPB_TESIS"
+
+
+# -------------------------------------------------------------------------
+# api
+# -------------------------------------------------------------------------
+api:
+  # Endpoint de busqueda. Devuelve un registro REDUCIDO, no el completo.
+  # Ver campos_no_disponibles mas abajo.
+  base_url: "https://theses.fr/api/v1/theses/recherche/"
+
+  # Endpoint de registro completo. Solo se usa si recuperar_resumenes es
+  # true. Una llamada por candidato.
+  url_detalle: "https://theses.fr/api/v1/theses/these/"
+
+  # Correo de contacto que viaja en el User-Agent.
+  # La API no lo exige, pero es la practica que corresponde con un servicio
+  # publico gratuito: permite que la Abes contacte si el volumen de
+  # peticiones les resulta problematico.
+  contacto: "CAMBIAR@POR-TU-CORREO.org"
+
+  # Segundos de espera entre peticiones.
+  # Valor conservador y deliberado: ni el OpenAPI de la API ni la
+  # documentacion de Abes declaran limite de tasa. Ante la ausencia de dato
+  # se asume lo prudente y no se paraleliza.
+  pausa_segundos: 1.0
+
+  timeout_segundos: 30
+
+  # Reintentos ante fallo de red o error 5xx, con espera creciente.
+  # Un 503 se trata aparte: puede indicar mantenimiento, y en ese caso el
+  # script aborta en lugar de insistir.
+  reintentos: 3
+  backoff_factor: 2.0
+
+  # Registros por pagina. La API admite hasta 100000, pero paginar en
+  # bloques pequenhos hace que un fallo a mitad de recuperacion cueste poco.
+  registros_por_pagina: 100
+
+
+# -------------------------------------------------------------------------
+# diccionario
+# -------------------------------------------------------------------------
+# UN diccionario por corrida. No se combinan.
+#
+# Razon (ver WPB_TESIS_limites_campos.md, seccion 5.3): las peticiones son
+# GET con todo codificado en la URL. Un diccionario de sesenta terminos por
+# varios campos, o cinco roles de persona por dos variantes de orden de
+# nombre, acumula centenares de clausulas. Hay dos techos que no avisan con
+# claridad -- el max_clause_count de Elasticsearch y el largo maximo de la
+# URL -- y el sintoma puede ser un 400 o, peor, un resultado truncado.
+#
+# Para obtener un corpus unido, se corre S01 una vez por diccionario y se
+# fusionan los CSV por NNT. Asi se conserva de que diccionario vino cada
+# tesis, informacion que se perderia combinandolos en una sola consulta.
+diccionario:
+
+  # Cual de los tres se usa en ESTA corrida: keywords | personas | instituciones
+  tipo: "keywords"
+
+  # Ruta al CSV. Se lee detectando el separador y absorbiendo el BOM, y se
+  # comprueba que existan las columnas obligatorias antes de usarlo
+  # (regla E.5): un CSV editado en Excel o Numbers puede salir con
+  # tabulaciones o punto y coma, y con BOM contaminando la primera columna.
+  ruta: "diccionarios/palabras_clave_tesis.csv"
+
+  # Columnas obligatorias en los tres tipos de diccionario:
+  #   keyword        termino principal
+  #   sinonimo_1..N  variantes; las vacias se ignoran
+  #   tipo_busqueda  exact | default   (ver mas abajo)
+  #   nucleo         etiqueta tematica, se arrastra a la salida
+  #   seleccionado   1 procesa la fila, 0 la omite
+
+  # tipo_busqueda -- VERIFICADO 2026-08-29
+  #   exact    envuelve el termino en comillas. Las comillas enrutan al
+  #            subcampo .exact e imponen orden de palabras: "buen vivir"
+  #            devuelve 7 y "vivir buen" devuelve 0.
+  #   default  sin comillas. ATENCION: el codigo de la API sustituye cada
+  #            espacio fuera de comillas por " AND ", y el operador por
+  #            defecto tambien es AND. Un termino multipalabra sin comillas
+  #            se ejecuta como la conjuncion de sus palabras, NO como frase.
+  #            En un diccionario donde la mayoria de las entradas son
+  #            multipalabra, la eleccion no es un matiz.
+
+  # Procesar cada fila en una consulta propia, en lugar de una consulta
+  # unica con todas las filas.
+  # true  = mas lento y mas peticiones, pero se sabe que termino recupero
+  #         que, y no se acerca a los techos descritos arriba.
+  # false = una sola consulta con todo. Riesgo de truncamiento silencioso.
+  # Se recomienda dejarlo en true.
+  una_consulta_por_fila: true
+
+
+# -------------------------------------------------------------------------
+# campos_busqueda
+# -------------------------------------------------------------------------
+# Sobre que campos del indice se lanzan los terminos del diccionario.
+# Cual de los tres bloques se aplica depende de diccionario.tipo.
+#
+# LEER ANTES: WPB_TESIS_limites_campos.md. Resumen de lo verificado el
+# 2026-08-29 con los scripts WPB_TESIS_S00_diagnostico*.py:
+#
+#   campo                  ACENTOS  STEMMING  FRASE
+#   titres.*                 si       si       si
+#   resumes.*                si       si       si
+#   sujetsLibelle            si       NO       si
+#   titrePrincipal           NO       NO       si
+#   sujetsRameauLibelle     s/d      s/d       si
+#   discipline              s/d      s/d      s/d
+#
+# CONSECUENCIA PARA LOS DICCIONARIOS: como sujetsLibelle no lematiza, las
+# flexiones de genero y numero deben ir como sinonimos explicitos. titres.*
+# y resumes.* las colapsarian solas, pero sujetsLibelle no. Lo que SI sobra
+# son las variantes que solo difieren en tildes o mayuscula inicial: los
+# tres campos principales las pliegan.
+campos_busqueda:
+
+  # --- si diccionario.tipo = keywords ---
+  palabras_clave:
+    titres: true              # comodin sobre subcampos por idioma. Campo
+                              # recomendado: pliega acentos y lematiza.
+    resumes: true             # idem. Ver nota en recuperacion.resumenes:
+                              # se puede INTERROGAR sin coste extra, pero
+                              # LEER el resumen exige otra llamada.
+    sujetsLibelle: true       # palabras clave libres. NO lematiza.
+    sujetsRameauLibelle: true # vocabulario controlado de la BnF. Bajo
+                              # rendimiento por construccion con terminologia
+                              # emergente: un termino nuevo puede no tener
+                              # descriptor.
+    discipline: false         # texto libre segun la especificacion TEF, "tal
+                              # como figura en la portada". Sin vocabulario
+                              # controlado, con variantes entre instituciones.
+    titrePrincipal: false     # APAGADO A PROPOSITO. No lematiza ni pliega
+                              # acentos, y recupera ~1/9 de lo que recupera
+                              # titres.* para el mismo termino. La diferencia
+                              # NO es de cobertura: _exists_ da 563.718 de
+                              # 563.719 para titrePrincipal frente a 555.485
+                              # para titres.fr. Encenderlo solo para buscar
+                              # una cadena literal concreta.
+
+  # --- si diccionario.tipo = personas ---
+  # Una fila del diccionario = una persona. El script expande esa fila a
+  # todos los roles encendidos, unidos con OR.
+  personas:
+    # Atajo. Si es true, se encienden los cinco roles e se ignoran las claves
+    # individuales de abajo. La precedencia se registra en el log de la
+    # corrida y en la copia archivada de la configuracion (regla A.5), de
+    # modo que quede rastro de que las claves individuales no se aplicaron.
+    todos_los_roles: true
+
+    auteursNP: true
+    directeursNP: true
+    presidentJuryNP: true
+    rapporteursNP: true       # ponentes
+    membresJuryNP: true       # examinadores. ATENCION: NO incluye a los
+                              # demas. La documentacion de Abes lo glosa como
+                              # "examinateurs", y el codigo de la API mapea
+                              # examinateurs(getMembresJury()): es el mismo
+                              # dato con dos nombres. Buscar solo aqui deja
+                              # fuera a presidente, ponentes y directores.
+
+    # Variantes de orden del nombre. Los campos NP y PN conviven en el indice
+    # y no estan documentados por Abes. La convencion PARECE ser nom-prenom
+    # frente a prenom-nom, pero es inferencia sobre el nombre del campo, no
+    # verificacion (regla B.2). Importan porque una persona indexada en un
+    # orden no aparece buscando en el otro.
+    # Encendido por defecto y marcado como NO VERIFICADO.
+    incluir_variantes_PN: true
+
+    # Los roles pueden solaparse: en la practica francesa un ponente suele
+    # sentarse en el tribunal. No se ha verificado si Abes lo registra en los
+    # dos campos o solo en rapporteurs. Consecuencia: al contar
+    # participaciones hay que deduplicar por PPN antes de agregar.
+
+  # --- si diccionario.tipo = instituciones ---
+  instituciones:
+    etabSoutenanceN: true
+    etabsCotutelleN: true
+    ecolesDoctoralesN: true
+    partenairesRechercheN: true
+
+
+# -------------------------------------------------------------------------
+# filtros
+# -------------------------------------------------------------------------
+# Se aplican a TODAS las consultas de la corrida, unidos con AND al termino
+# del diccionario.
+#
+# ALCANCE (regla A.4): estos filtros recortan ANTES de recuperar, de modo que
+# redefinen el corpus de candidatos completo, no solo la vista exportada. Dos
+# corridas con filtros distintos no son comparables.
+#
+# Se escriben todos dentro del parametro q con sintaxis campo:(valor). NO se
+# usa el parametro filtres de la API: la documentacion de Abes indica que
+# "aparece unicamente cuando se han activado filtros en la interfaz", es
+# decir, es un artefacto de la web y no una via de uso para la API.
+filtros:
+
+  # --- estado de la tesis ---
+  # soutenue  solo defendidas          (valor por defecto del proyecto)
+  # enCours   solo en preparacion
+  # *         todas
+  #
+  # ATENCION si se cambia a enCours o *: las tesis en curso NO tienen NNT,
+  # usan numSujet. Las APIs de difusion (enlaces de acceso) y de exportacion
+  # solo aceptan NNT. Parte del corpus no admitiria esas llamadas en S02, que
+  # debe registrarlo como exclusion contada, no omitirlo en silencio.
+  # Hay ademas un caso intermedio: tesis ya defendidas pendientes de
+  # tratamiento conservan numSujet y todavia no tienen NNT.
+  status: "soutenue"
+
+  # --- solo tesis accesibles en linea ---
+  # true anhade accessible:oui. Es una subfaceta de status:(soutenue).
+  # Recorta bastante el corpus: dejar en false salvo que solo interesen las
+  # que tienen texto disponible.
+  solo_accesibles: false
+
+  # --- periodo ---
+  # Se aplica sobre dateSoutenance. Formato AAAA-MM-DD, o null para no
+  # acotar por ese extremo.
+  #
+  # SESGO CONOCIDO, documentado por Abes: las tesis impresas de las que solo
+  # se conoce el anho se registran como AAAA-01-01. Eso produce una
+  # acumulacion artificial de defensas cada 1 de enero, concentrada en el
+  # material antiguo. Cualquier serie temporal lo arrastra, y un recorte que
+  # empiece un 2 de enero pierde ese material entero.
+  periodo_inicio: null
+  periodo_fin: null
+
+  # --- idioma de la tesis ---
+  # Lista de codigos ISO 639-1. Vacia = sin filtro.
+  langues: []
+
+  # --- dominio tematico ---
+  # Valores de la lista oficial:
+  # https://theses.fr/schemas/tef/recommandation/tef_oai_setSpec.html
+  # Vacia = sin filtro. La lista no se ha incorporado al proyecto todavia.
+  oaiSetNames: []
+
+  # --- institucion, por codigo corto de 4 caracteres ---
+  # Lista de codigos:
+  # https://documentation.abes.fr/sudoc/regles/CodesUnivEtab.htm
+  # Vacia = sin filtro. La lista no se ha incorporado al proyecto todavia.
+  codeEtab: []
+
+
+# -------------------------------------------------------------------------
+# sondeo
+# -------------------------------------------------------------------------
+# Fase previa a la descarga: mide cuanto aporta cada termino del diccionario
+# SIN recuperar registros.
+#
+# POR QUE EXISTE. La corrida del 2026-08-29 recupero 4441 candidatos para un
+# corpus que se esperaba de menos de cien, y el hecho solo se supo tras 74
+# minutos de descarga de resumenes. El contador totalHits llega en la primera
+# peticion de cada consulta: el tamanho de la cosecha se puede conocer en
+# segundos.
+#
+# COSTE. Una consulta por termino, mas una por termino y campo si por_campo
+# es true. Con 52 terminos y 4 campos son ~260 consultas, unos 4 minutos.
+# Es barato comparado con lo que evita.
+sondeo:
+
+  activo: true
+
+  # Desglose por campo de cada termino. Es lo que permite ver si el volumen
+  # viene de un campo concreto -- tipicamente resumes, donde una mencion de
+  # pasada pesa igual que el tema de la tesis.
+  # Multiplica las consultas por el numero de campos activos.
+  por_campo: true
+
+  # --- avisos sobre los terminos ---
+  # Dos reglas, cada una de una linea. Basta que se cumpla una.
+
+  # 1. VOLUMEN. Se avisa si un termino devuelve mas de este numero de
+  #    resultados POR SI SOLO. Es la regla que detecta el termino demasiado
+  #    ancho: en una base de tesis francesas, 'decolonisation' recupera toda
+  #    la historiografia del imperio y no la teoria decolonial.
+  #
+  #    Como fijarlo: en relacion con el corpus que se busca, no en abstracto.
+  #    Si el objetivo son ~100 tesis, un termino que devuelve 300 ya es
+  #    demasiado ancho y conviene bajarlo. 1000 es un valor de arranque
+  #    conservador, pensado para no ahogar en avisos la primera corrida.
+  umbral_volumen: 1000
+
+  # 2. CERO. Se avisa de los terminos que no devuelven nada: no estan en el
+  #    indice y sobran del diccionario. Siempre activo, sin parametro.
+
+  # POR QUE NO SE MIDE EL TERMINO CONTRA SU PROPIA FILA
+  # Hubo dos criterios mas, retirados en v0.4 y v0.5. Uno comparaba el aporte
+  # de cada termino con su parte uniforme dentro de la fila; el otro, con una
+  # fraccion fija de la fila.
+  #
+  # Los dos daban por supuesto que los terminos de una fila deberian aportar
+  # cantidades parecidas, y ese supuesto contradice el proposito del
+  # diccionario: los sinonimos estan para capturar variaciones, y se espera
+  # que aporten cantidades distintas. Un sinonimo raro que devuelve tres
+  # tesis es lo esperable, no un problema. Y en una fila de dos terminos, el
+  # principal supera el 50% casi por definicion.
+  #
+  # El informe sigue mostrando el porcentaje sobre la fila como contexto de
+  # lectura, pero no dispara ningun aviso.
+
+  # --- volumen total ---
+  # Si la suma estimada supera este numero, se pide confirmacion antes de
+  # descargar. El limite no es tecnico sino de curacion: cada candidato lo
+  # tiene que mirar una persona.
+  maximo_candidatos: 500
+
+  # NOTA sobre la aritmetica del sondeo: los totales por termino y por fila NO
+  # son aditivos. Dos terminos pueden recuperar la misma tesis, de modo que la
+  # suma excede el total unico siempre que haya solapamiento. Sirven para
+  # comparar terminos entre si, no para descomponer el total.
+
+
+# -------------------------------------------------------------------------
+# recuperacion
+# -------------------------------------------------------------------------
+recuperacion:
+
+  # El registro que devuelve la busqueda NO trae el resumen. Recuperarlo
+  # exige una llamada adicional a api.url_detalle por cada candidato.
+  #
+  # ENCENDIDO POR DEFECTO: sin resumen, la persona que valida decide con
+  # titulo, disciplina y palabras clave, y el riesgo es descartar por falta
+  # de informacion.
+  #
+  # COSTE: una peticion por candidato. Con pausa_segundos=1.0 y 500
+  # candidatos son ~8 minutos. Apagarlo solo si la lista es muy grande y se
+  # va a filtrar antes por otro criterio.
+  resumenes: true
+
+  # Orden de preferencia de idioma para la columna de resumen del CSV de
+  # curacion. Se toma el primero disponible y se registra en otra columna
+  # cual se uso. En el JSON van todos los idiomas, sin tocar.
+  idiomas_resumen_curacion: ["es", "fr", "en"]
+
+  # Recorte del resumen en el CSV de curacion, en caracteres. El resumen
+  # completo puede tener miles y hace el CSV inmanejable en una hoja de
+  # calculo. En el JSON va completo. 0 = sin recorte.
+  resumen_max_caracteres: 1200
+
+
+# -------------------------------------------------------------------------
+# curacion
+# -------------------------------------------------------------------------
+# Columnas que S01 anhade vacias para que las rellene la persona que revisa.
+curacion:
+
+  # validado  1 incluir, 0 descartar, vacio sin revisar
+  # motivo    por que se incluye o se descarta
+  # notas     anotacion libre
+  #
+  # Los tres son texto libre editado a mano, de modo que pueden contener el
+  # separador del CSV, comillas y saltos de linea. Se leen y escriben con el
+  # modulo csv y comillas, nunca partiendo por comas.
+
+  # Valores que se aceptan como afirmativos en la columna validado, sin
+  # distinguir mayusculas ni espacios sobrantes. Cualquier valor no vacio
+  # que no este en esta lista se registra en el log como NO RECONOCIDO y la
+  # fila NO se da por validada: tratarlo como 0 en silencio convertiria un
+  # error de escritura en una exclusion invisible.
+  valores_validado_si: ["1", "si", "sí", "s", "x", "yes", "y", "true"]
+
+  # Conservar las anotaciones ya escritas al reejecutar S01.
+  # true  = las filas cuyo identificador ya existe en el CSV anterior se
+  #         conservan con sus anotaciones intactas, y solo se anhaden las
+  #         nuevas al final, marcadas en la columna corrida_origen.
+  # false = se escribe un archivo limpio y SE PIERDE la curacion previa.
+  #
+  # Dejar en true. Lo que se pisa aqui es trabajo manual irrecuperable, no
+  # datos que se puedan volver a descargar.
+  preservar_anotaciones: true
+
+
+# -------------------------------------------------------------------------
+# output
+# -------------------------------------------------------------------------
+output:
+
+  # Se resuelve contra el DIRECTORIO DE TRABAJO, no contra la ubicacion del
+  # .py (regla E.4). El cd previo a la ejecucion no es opcional.
+  directorio: "salidas/"
+
+  # Patron de nombre. {iter} = metadata.iteracion, {dicc} = diccionario.tipo.
+  # Ambos aparecen en el nombre para que dos corridas con diccionarios
+  # distintos no se pisen (regla C.5).
+  patron_nombre: "WPB_TESIS_{iter}_{dicc}_S01"
+
+  # CSV para la curacion, JSON para conservar la estructura anidada sin
+  # aplanar. Los dos llevan la misma informacion; el JSON es la fuente.
+  formato_csv: true
+  formato_json: true
+
+  # Separador del CSV. Los valores que lo contengan se sanean sustituyendolo
+  # por espacio, y el script registra en el log cuantas veces intervino
+  # (regla B.6): sanear altera el dato de origen, y quien lea el CSV no
+  # puede distinguir un nombre alterado de uno que venia asi.
+  separador_csv: ","
+
+  # Sobrescritura. Si ya existen archivos que coinciden con el patron, el
+  # script los lista y pide confirmacion antes de escribir (regla C.1).
+  #
+  # El flag --force de la linea de comandos salta esa confirmacion y GANA
+  # sobre lo que diga este archivo. Cada override efectivo se anota en el log
+  # y en la copia archivada de la configuracion (regla A.5).
+  #
+  # --force se declara en cada invocacion y NO se hereda del entorno
+  # (regla C.3).
+  #
+  # Sin terminal interactiva y sin --force, el script ABORTA en lugar de
+  # esperar: un input() sin salvaguarda cuelga indefinidamente en notebook,
+  # cron o pipeline encadenado (regla C.2).
+  confirmar_sobrescritura: true
+
+  # S01 NO elimina archivos huerfanos de corridas previas (regla C.4). Si se
+  # cambia diccionario.tipo entre corridas con la misma iteracion, la salida
+  # de la corrida anterior sobrevive junto a las nuevas.
+
+
+# -------------------------------------------------------------------------
+# log
+# -------------------------------------------------------------------------
+log:
+  # Se abre en modo append y cada ejecucion escribe un separador con
+  # timestamp al inicio (regla D.2). Sin el, dos corridas quedan
+  # indistinguibles en el mismo archivo.
+  # Se abre siempre con encoding utf-8 explicito (regla E.1):
+  # logging.FileHandler no lo declara por defecto y aborta en Windows ante
+  # caracteres no representables en cp1252.
+  ruta: "salidas/WPB_TESIS_S01_busqueda.log"
+  nivel: "INFO"
+
+  # Cada corrida deja ademas una copia de ESTE archivo tal como fue leido,
+  # junto a los outputs, con el nombre
+  # WPB_TESIS_{iter}_{dicc}_S01_config_usado.yaml (regla D.1). El original se
+  # sigue editando; la copia congela el estado que produjo esos datos.
+  archivar_config: true
+
+  # NOTA: no hay parametro para desactivar el reporte de exclusiones. Todo
+  # filtro que descarte registros reporta cuantos descarto, en el log y en el
+  # archivo de estadisticas (regla D.4). Un corpus sin conteo de exclusiones
+  # no permite auditar el recorte, de modo que un interruptor para apagarlo
+  # contradiria la regla. Es siempre activo.
+
+
+# =========================================================================
+# NO IMPLEMENTADO
+# =========================================================================
+# Claves que se conservan documentadas a proposito, con la razon. No las lee
+# el script (regla A.2: toda clave del YAML debe tener lectura en el codigo,
+# o estar marcada aqui).
+
+no_implementado:
+
+  # --- modo incremental ---
+  # La idea era guardar la fecha de la corrida anterior y anhadir
+  # dateInsertionDansES:([fecha TO *]) para recuperar solo lo indexado desde
+  # entonces.
+  #
+  # NO SE IMPLEMENTA porque el campo no esta verificado. El 2026-08-29 el
+  # filtro por rango devolvio el indice completo: 563.719 registros con y sin
+  # restriccion. No se determino si el campo se ignora o si todo el indice se
+  # reconstruyo despues de enero de 2024.
+  #
+  # Implementarlo sobre un campo no verificado haria que cada actualizacion
+  # recuperase el corpus entero mientras el log declara que recupero solo lo
+  # nuevo: fallo silencioso y plausible.
+  #
+  # EN SU LUGAR: S01 corre siempre completo y marca las filas nuevas
+  # comparando contra los NNT ya presentes en el CSV anterior.
+  modo_incremental: false
+
+  # --- parametro filtres de la API ---
+  # No se usa. La documentacion de Abes indica que "aparece unicamente cuando
+  # se han activado filtros en la interfaz de theses.fr": es un artefacto de
+  # la web. Ademas el codigo fuente de la API y el ejemplo de su propio
+  # controlador se contradicen sobre el separador de la sintaxis.
+  # Todos los filtros van por q con sintaxis campo:(valor).
+  usar_parametro_filtres: false
+
+  # --- TF-IDF ---
+  # Se converso generar un TF-IDF de los terminos de las tesis, un archivo
+  # por corrida. PENDIENTE DE DECIDIR EN QUE ETAPA: calcularlo en S01 lo
+  # haria sobre candidatos sin validar, mezclando lo pertinente con lo que se
+  # va a descartar. Sobre el corpus validado de S02 mide otra cosa.
+  # Sin implementar en ninguna de las dos hasta que se decida.
+  tfidf: false
+
+
+# =========================================================================
+# CAMPOS QUE NO DEVUELVE LA BUSQUEDA
+# =========================================================================
+# El endpoint de busqueda devuelve un registro REDUCIDO. Estos campos NO
+# viajan en el y por tanto S01 no los puede exportar aunque se activaran:
+#
+#   resumes        -> se recupera con recuperacion.resumenes = true
+#   langues, accessible, etabCotutelle, codeEtab, numSujet, titres, mapSujets
+#                  -> requieren /api/v1/theses/these/{id}, que S02 llama
+#                     sobre lo validado
+#
+# ATENCION a numSujet: aunque se marco para exportar, NO esta en el registro
+# reducido. S01 solo dispone del campo id. No se ha verificado si id contiene
+# el NNT para las defendidas y el numSujet para las demas; hasta comprobarlo,
+# S01 emite id tal cual y S02 resuelve el identificador definitivo.
+#
+# Tampoco vienen de este endpoint:
+#   enlaces de acceso al texto  -> /api/v1/button/{nnt}      (API diffusion)
+#   ficha consolidada de persona-> /api/v1/personnes/personne/{ppn}
+#   metadatos en formato TEF    -> /api/v1/export/tefudoc/{nnt}
+#   ejemplares en bibliotecas   -> sudoc.fr/services/multiwhere/{ppn}
+#
+# =========================================================================
+# NOTAS DE EJECUCION
+# =========================================================================
+# Las lineas de invocacion estan en el bloque COMO CORRER de la cabecera.
+# Aqui solo lo que no cabe alli.
+#
+# - python3 en macOS/Linux, py en Windows. python a secas puede apuntar a
+#   Python 2 en macOS/Linux, o no existir en Windows.
+#
+# - Entorno virtual, si se prefiere aislar las dependencias:
+#     macOS/Linux         python3 -m venv .venv && source .venv/bin/activate
+#     Windows PowerShell  py -m venv .venv; .venv\Scripts\Activate.ps1
+#     Windows CMD         py -m venv .venv & .venv\Scripts\activate.bat
+#   Si PowerShell bloquea la activacion por ExecutionPolicy:
+#     Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+#
+# - Alternativa a -X utf8, valida para toda la sesion de terminal:
+#     PowerShell   $env:PYTHONUTF8 = "1"
+#     CMD          set PYTHONUTF8=1
+#   Hay que repetirlo en cada sesion nueva.
+#   Si la consola muestra caracteres corruptos, agregar chcp 65001.
+#
+# - output.directorio, diccionario.ruta y log.ruta se resuelven contra el
+#   DIRECTORIO DE TRABAJO, no contra la ubicacion del .py (regla E.4).
+#   El cd inicial no es opcional.
+#
+# - En Windows, si el proyecto esta en otra unidad, cambiar de unidad antes
+#   del cd:  D:  y luego  cd D:\ruta\al\proyecto
+#
+# - S01 no acepta --csv-dir. Ese flag es de S02 y S03 en el pipeline BIBLM,
+#   donde sirve para apuntar a los CSV de la etapa anterior. S01 es la
+#   primera etapa: su unica entrada es el diccionario, y su ruta se declara
+#   en diccionario.ruta.
+#
+# =========================================================================
+# NOTA SOBRE DATOS PERSONALES
+# =========================================================================
+# La salida contiene nombres y apellidos de autoras, directoras y miembros de
+# tribunal. Abes los publica al amparo del articulo 89.1 del RGPD y no cabe
+# derecho de supresion sobre el registro de tesis defendidas.
+#
+# Sustituir nombres por PPN NO anonimiza: el PPN es publico y resoluble en
+# idref.fr, y el NNT identifica la tesis, cuya relacion con la autora es
+# practicamente 1:1.
+#
+# La decision de que columnas salen en un deposito publico se parametriza
+# aparte y no se resuelve en este archivo.

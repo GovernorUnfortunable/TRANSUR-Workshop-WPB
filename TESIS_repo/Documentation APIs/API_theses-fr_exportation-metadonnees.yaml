@@ -1,0 +1,335 @@
+openapi: 3.1.0
+info:
+  title: API exportation des métadonnées de theses.fr
+  description: "Cette API gère la diffusion des fichiers de thèses, en accès libre\
+    \ ou en accès restreint, sur theses.fr."
+  version: "1.0"
+servers:
+- url: https://theses.fr
+paths:
+  /api/v1/document/{nnt}:
+    get:
+      tags:
+      - diffusion-controller
+      summary: Renvoie un fichier de thèse en accès libre
+      description: Renvoie les thèses en accès libre
+      operationId: document
+      parameters:
+      - name: nnt
+        in: path
+        description: Numéro National de Thèse
+        required: true
+        schema:
+          type: string
+        example: 2013MON30092
+      responses:
+        "200":
+          description: "Opération terminée avec succès, le fichier de thèse est renvoyé"
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "400":
+          description: Le format du numéro national de thèse fourni est incorrect
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "403":
+          description: Accès refusé
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+  /api/v1/document/{nnt}/**:
+    get:
+      tags:
+      - diffusion-controller
+      summary: Fournit un lien d'accès direct au fichier de thèse (ou de l'une de
+        ses annexes) si la thèse est disponible en accès libre
+      description: permet de télécharger le ou les fichiers de la thèse depuis la
+        plateforme Abes
+      operationId: accesDirectAuFichier
+      parameters:
+      - name: nnt
+        in: path
+        description: Numéro National de Thèse
+        required: true
+        schema:
+          type: string
+        example: 2013MON30092
+      responses:
+        "200":
+          description: "Opération terminée avec succès, redirection sur l'intranet\
+            \ de l'établissement"
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "400":
+          description: Le format du numéro national de thèse fourni est incorrect
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "403":
+          description: Accès refusé
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+  /api/v1/document/protected/{nnt}:
+    get:
+      tags:
+      - diffusion-controller
+      summary: Renvoie un fichier de thèse (ou une liste HTML de liens si la thèse
+        est constituée de plusieurs fichiers) en accès restreint
+      description: Renvoie les thèses disponibles pour les membres de l'Enseignement
+        Supérieur et de la Recherche après authentification via la fédération d'identité
+        Renater
+      operationId: documentProtected
+      parameters:
+      - name: nnt
+        in: path
+        description: Numéro National de Thèse
+        required: true
+        schema:
+          type: string
+        example: 2013MON30092
+      responses:
+        "200":
+          description: "Opération terminée avec succès, le fichier de thèse est renvoyé"
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "400":
+          description: Le format du numéro national de thèse fourni est incorrect
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "403":
+          description: Accès refusé
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+  /api/v1/document/protected/{nnt}/**:
+    get:
+      tags:
+      - diffusion-controller
+      summary: Fournit un lien d'accès direct au fichier de thèse (ou de l'une de
+        ses annexes) en accès restreint
+      description: permet de télécharger le ou les fichiers de la thèse depuis la
+        plateforme Abes après authentification via la fédération d'identité Renater
+      operationId: accesDirectAuFichierProtected
+      parameters:
+      - name: nnt
+        in: path
+        description: Numéro National de Thèse
+        required: true
+        schema:
+          type: string
+        example: 2013MON30092
+      responses:
+        "200":
+          description: "Opération terminée avec succès, le fichier de thèse est renvoyé"
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "400":
+          description: Le format du numéro national de thèse fourni est incorrect
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "403":
+          description: Accès refusé
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+  /api/v1/document/intranetEtab/{nnt}:
+    get:
+      tags:
+      - diffusion-controller
+      summary: Redirige sur l'intranet de l'établissement où est disponible le fichier
+        de thèse
+      description: il faut disposer d'un compte local à l'établissement pour accéder
+        au fichier de la thèse
+      operationId: documentIntranetEtab
+      parameters:
+      - name: nnt
+        in: path
+        description: Numéro National de Thèse
+        required: true
+        schema:
+          type: string
+        example: 2013MON30092
+      responses:
+        "200":
+          description: "Opération terminée avec succès, redirection sur l'intranet\
+            \ de l'établissement"
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "400":
+          description: Le format du numéro national de thèse fourni est incorrect
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "403":
+          description: Accès refusé
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "404":
+          description: L'url de la thèse n'est pas trouvée dans les métadonnées de
+            description de la thèse (TEF) ou l'url ne répond pas
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+  /api/v1/button/{nnt}:
+    get:
+      tags:
+      - bouton-controller
+      summary: Retourne une liste de boutons permettant l'accès aux fichiers de thèses
+      description: "Les thèses peuvent être disponibles à plusieurs endroits et sous\
+        \ différentes formes, potentiellement être sous accès restreint, les boutons\
+        \ et leurs liens y donnent accès."
+      operationId: boutons
+      parameters:
+      - name: nnt
+        in: path
+        description: Numéro National de Thèse
+        required: true
+        schema:
+          type: string
+        example: 2013MON30092
+      responses:
+        "400":
+          description: Le format du numéro national de thèse fourni est incorrect
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ResponseBoutons"
+        "200":
+          description: Opération terminée avec succès
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ResponseBoutons"
+        "500":
+          description: Service indisponible
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ResponseBoutons"
+  /api/v1/abes/{nnt}:
+    get:
+      tags:
+      - diffusion-controller
+      summary: Renvoie un fichier de thèse stocké à l'Abes et disponible en accès
+        libre
+      description: Renvoie les thèses stockées à l'Abes et disponibles en accès libre
+      operationId: documentAbes
+      parameters:
+      - name: nnt
+        in: path
+        description: Numéro National de Thèse
+        required: true
+        schema:
+          type: string
+        example: 2013MON30092
+      responses:
+        "200":
+          description: "Opération terminée avec succès, le fichier de thèse est renvoyé"
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "400":
+          description: Le format du numéro national de thèse fourni est incorrect
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "403":
+          description: Accès refusé
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+components:
+  schemas:
+    Bouton:
+      type: object
+      properties:
+        libelle:
+          type: string
+        url:
+          type: string
+        dateFin:
+          type: string
+        typeAcces:
+          type: string
+          enum:
+          - ACCES_LIGNE
+          - ACCES_ESR
+          - EMBARGO
+          - CONFIDENTIALITE
+          - SUDOC
+    Categorie:
+      type: object
+      properties:
+        libelle:
+          type: string
+        sousCategories:
+          type: array
+          items:
+            $ref: "#/components/schemas/SousCategorie"
+        boutons:
+          type: array
+          items:
+            $ref: "#/components/schemas/Bouton"
+    ResponseBoutons:
+      type: object
+      properties:
+        categories:
+          type: array
+          items:
+            $ref: "#/components/schemas/Categorie"
+    SousCategorie:
+      type: object
+      properties:
+        libelle:
+          type: string
+        boutons:
+          type: array
+          items:
+            $ref: "#/components/schemas/Bouton"

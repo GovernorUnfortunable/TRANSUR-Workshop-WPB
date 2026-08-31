@@ -1,0 +1,14 @@
+2026-08-29 12:47:19,524 [INFO] ======================================================================
+2026-08-29 12:47:19,525 [INFO] WPB_TESIS_S00_diagnostico v0.1 -- inicio
+2026-08-29 12:47:19,525 [INFO] Contacto declarado en User-Agent: mmilia@nd.edu
+2026-08-29 12:47:19,794 [INFO] P1 | sin comillas           | total=7 | q=sujetsLibelle:(buen vivir)
+2026-08-29 12:47:20,997 [INFO] P1 | con comillas           | total=7 | q=sujetsLibelle:("buen vivir")
+2026-08-29 12:47:22,218 [INFO] P2 | con tilde              | total=63 | q=sujetsLibelle:("décolonial")
+2026-08-29 12:47:23,415 [INFO] P2 | sin tilde              | total=63 | q=sujetsLibelle:("decolonial")
+2026-08-29 12:47:24,620 [INFO] P3 | mayuscula              | total=1 | q=sujetsLibelle:("Quilombo")
+2026-08-29 12:47:25,825 [INFO] P3 | minuscula              | total=1 | q=sujetsLibelle:("quilombo")
+2026-08-29 12:47:27,052 [INFO] P4 | titrePrincipal         | total=5 | q=titrePrincipal:(decolonial)
+2026-08-29 12:47:28,280 [INFO] P4 | titres.fr (control)    | total=44 | q=titres.fr:(decolonial)
+2026-08-29 12:47:30,205 [INFO] P5 | rango abierto          | total=563719 | q=* AND dateInsertionDansES:([2024-01-01 TO *])
+2026-08-29 12:47:32,153 [INFO] P5 | sin filtro (control)   | total=563719 | q=*
+2026-08-29 12:47:33,156 [INFO] Fin del diagnostico. Registro en WPB_TESIS_S00_diagnostico.log

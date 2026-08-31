@@ -1,0 +1,18 @@
+OK. Va la lista de ajustes al script
+
+
+1. AGREGAR una red de co-participación en los tribunales de tesis. 
+
+  '# --- red de co-participacion en tribunales (total) ---
+  # PRENDIDA POR DEFECTO
+  # Usando networkx vemos en todo el período estudiado cómo se agrupan
+  # los miembros del tribunal.'
+
+2. AGREGAR qué quiere decir NNT
+
+
+
+
+
+
+

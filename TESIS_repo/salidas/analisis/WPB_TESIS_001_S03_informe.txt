@@ -1,0 +1,657 @@
+==========================================================================
+WPB_TESIS_S03 -- INFORME DE ANALISIS
+==========================================================================
+
+Corrida:            2026-08-31T00:45:39
+Script:             WPB_TESIS_S03_analisis.py v0.3
+Configuracion:      WPB_TESIS_S03_analisis.yaml
+CSV de entrada:     salidas/WPB_TESIS_001_keywords_S01.csv
+Iteracion:          001 (derivada del nombre del CSV, regla C.6)
+Origen de los datos: API de busqueda de theses.fr (no el data dump
+                     Etalab ni el dataset Aboucaya & Jasim 2026).
+
+--------------------------------------------------------------------------
+UNIVERSO ANALIZADO
+--------------------------------------------------------------------------
+Modo:               candidatos
+  Se analizan todas las filas, curadas o no.
+
+  La curacion cambia lo que MIDEN las metricas de persistencia, no
+  solo cuantas filas entran. 'Ya habia aparecido antes' es relativo
+  al universo analizado: una jurado que estuvo en tres tesis
+  descartadas y aparece en una validada cuenta como nueva en modo
+  'validados' y como recurrente en modo 'candidatos'.
+
+Filas en el CSV:    1294
+Filas analizadas:   1294
+Tesis distintas:    1294
+  El CSV tiene una fila por (tesis, concepto): una tesis recuperada
+  por dos terminos aparece dos veces. Las metricas POR CONCEPTO usan
+  las filas de ese concepto; las del CORPUS COMPLETO usan las tesis
+  distintas, para no contarla dos veces.
+Descartadas por el modo:     0
+Recorte temporal:   sin recorte
+Granularidad:       anual
+
+--------------------------------------------------------------------------
+DESCRIPCION DEL CORPUS POR TERMINO
+--------------------------------------------------------------------------
+n_tesis        filas que ese termino recupero
+unicas         de ellas, las que NINGUN otro termino recupero
+cobertura      primer y ultimo anho con tesis de ese termino
+
+termino                       n_tesis   unicas      cobertura  s/fecha
+buen vivir                         51       51      1993-2026        0
+conviviality                      491      491      1985-2026        0
+decolonial                        694      694      1985-2026        0
+pluriverso                          3        3      2020-2024        0
+quilombo                            5        5      1999-2016        0
+teoria de la dependencia           50       50      1988-2025        0
+
+--------------------------------------------------------------------------
+SOLAPAMIENTO ENTRE TERMINOS
+--------------------------------------------------------------------------
+Tesis recuperadas por mas de un termino: 0
+La suma de los subcorpus SUPERA el tamanho del corpus, y es
+correcto: una tesis pertenece a todos los terminos que la
+recuperaron.
+La tabla completa esta en WPB_TESIS_001_S03_solapamiento.csv
+
+--------------------------------------------------------------------------
+PERSONAS MAS RECURRENTES -- CORPUS COMPLETO
+--------------------------------------------------------------------------
+Unidad: NUMERO DE TESIS. Una persona que figura en dos roles de la
+misma tesis cuenta UNA vez (deduplicada por PPN dentro de la fila).
+Identificador: PPN de persona en IdRef, resoluble en idref.fr/{ppn}.
+Roles contados: directeurs, president, rapporteurs, examinateurs
+
+persona                                PPN           tesis
+Vermeren, Pierre                       056593953         8
+Dard, Olivier                          03392208X         8
+Vaïsse, Maurice                        027173828         8
+Goddard, Jean-Christophe               029103622         7
+Garnier, Xavier                        057554234         7
+
+  [buen vivir]
+    Fritz, Jean-Claude                   028264932       3
+    Berr, Éric                           110220501       2
+    Vivien, Franck-Dominique             033709017       2
+    Bellier, Irène                       030852595       2
+    Herrera, Carlos-Miguel               034753133       2
+
+  [conviviality]
+    Paquot, Thierry                      027057720       6
+    Maffesoli, Michel                    027001067       3
+    Toulotte, Jean-Marc                  059896795       3
+    Treuillet, Sylvie                    147354285       3
+    Harba, Rachid                        069456445       3
+
+  [decolonial]
+    Vermeren, Pierre                     056593953       8
+    Dard, Olivier                        03392208X       8
+    Vaïsse, Maurice                      027173828       8
+    Garnier, Xavier                      057554234       7
+    Fonkoua, Romuald                     085491446       7
+
+  [pluriverso]
+    Buignet, Christine                   116834617       1
+    Giraud, Nicolas                      144093669       1
+    Méaux, Danièle                       057556261       1
+    Flécheux, Céline                     098742469       1
+    Solinas, Stéphanie                   135430704       1
+
+  [quilombo]
+    Droulers, Martine                    030163765       1
+    Le Tourneau, François-Michel         082998701       1
+    Broggio, Céline                      088565513       1
+    Brondízio, Eduardo S.                145729222       1
+    Chartier, Denis                      069087776       1
+
+  [teoria de la dependencia]
+    Schmidt, Géraldine                   033946787       3
+    Lamarque, Éric                       057665974       2
+    Pesqueux, Yvon                       027067742       2
+    Stévenot, Anne                       102203423       2
+    Wirtz, Peter                         059727586       2
+
+--------------------------------------------------------------------------
+INSTITUCIONES DE DEFENSA
+--------------------------------------------------------------------------
+Es la institucion DONDE SE DEFENDIO la tesis. NO es la
+institucion de los miembros del tribunal, que el registro no
+contiene.
+
+  Paris 1                                                      99
+  Paris  EHESS                                                 61
+  Paris 3                                                      48
+
+  [buen vivir]
+    Paris 1                                                     6
+    Paris  EHESS                                                5
+    Bordeaux                                                    4
+
+  [conviviality]
+    Paris 6                                                    22
+    Paris 11                                                   19
+    Lyon  INSA                                                 15
+
+  [decolonial]
+    Paris 1                                                    81
+    Paris  EHESS                                               48
+    Paris 3                                                    37
+
+  [pluriverso]
+    Aix-Marseille                                               1
+    Paris 13                                                    1
+    Limoges                                                     1
+
+  [quilombo]
+    Sorbonne Paris Cité                                         1
+    Toulouse 2                                                  1
+    Paris  EHESS                                                1
+
+  [teoria de la dependencia]
+    Jouy-en Josas  HEC                                          4
+    Aix-Marseille 3                                             3
+    Université de Lorraine                                      2
+
+--------------------------------------------------------------------------
+DISCIPLINAS
+--------------------------------------------------------------------------
+Texto libre segun la especificacion TEF: las variantes
+ortograficas NO se agrupan y cuentan por separado.
+
+  [buen vivir]
+    Philosophie                                                 8
+    Sociologie                                                  5
+    Droit                                                       5
+    Droit public                                                3
+    Sciences économiques                                        2
+    Anthropologie sociale et ethnologie                         2
+    Science politique                                           1
+    Sciences juridiques - droit international                   1
+    Géographie et aménagement urbain                            1
+    Philosophie politique                                       1
+
+  [conviviality]
+    Informatique                                               59
+    Sciences appliquées                                        36
+    Sociologie                                                 24
+    Physique                                                   12
+    Histoire                                                   11
+    Sciences de gestion                                        10
+    Géographie                                                  9
+    Philosophie                                                 8
+    Sciences de l'éducation                                     7
+    Génie électrique                                            7
+
+  [decolonial]
+    Histoire                                                  128
+    Droit public                                               40
+    Sociologie                                                 32
+    Science politique                                          32
+    Philosophie                                                21
+    Histoire contemporaine                                     19
+    Droit                                                      17
+    Géographie                                                 15
+    Études anglophones                                         11
+    Histoire et civilisations                                  10
+
+  [pluriverso]
+    Pratique et théorie de la création littéraire et artisti    1
+    Sciences de l'éducation                                     1
+    Droit mention Histoire du droit et des institutions         1
+
+  [quilombo]
+    Géographie et aménagement urbain                            1
+    Anthropologie sociale et historique                         1
+    Ethnologie                                                  1
+    Lettres                                                     1
+    Langues et littératures étrangères                          1
+
+  [teoria de la dependencia]
+    Sciences de gestion                                        19
+    Sciences économiques                                        6
+    Informatique                                                2
+    Mathématiques                                               2
+    Physique                                                    2
+    Sociologie                                                  2
+    Sciences de gestion et du management                        1
+    Sciences politiques                                         1
+    Économie                                                    1
+    Philosophie                                                 1
+
+--------------------------------------------------------------------------
+RED DE CO-PARTICIPACION EN TRIBUNALES -- CORPUS COMPLETO
+--------------------------------------------------------------------------
+Nodo = miembro de tribunal (PPN de persona).
+Vinculo = haber estado en el mismo tribunal.
+Tesis que aportaron al grafo: 1283 de 1294
+
+  personas (nodos):        3586
+  vinculos (aristas):      8809
+  componentes:             724
+  componente mayor:        1422 personas (39.7%)
+  grado medio:             4.91
+  comunidades (Louvain):   742
+  modularidad:             0.945
+
+  AVISO: la modularidad supera el umbral configurado.
+  El tribunal de cada tesis es un clique completo. Si las
+  tesis casi no comparten jurados, el grafo es un conjunto de
+  cliques casi disjuntos y las comunidades reproducen las
+  tesis, no agrupamientos del campo. Los clusters de la
+  figura no deben leerse como grupos academicos mientras
+  esto se cumpla.
+
+  Comunidades por encima del minimo, etiquetadas con la persona
+  de mayor grado dentro de cada una:
+    Bellier, Irène                         030852595     117 personas
+    Raulet-Croset, Nathalie                102186049       6 personas
+    Cottias, Myriam                        029261090      41 personas
+    Vives, Jean-Michel                     060941863       5 personas
+    Torrent, Mélanie                       095906797      47 personas
+    Haritaworn, Jin                        189497173       6 personas
+    Chiss, Jean-Louis                      026787199       5 personas
+    Poupeau, Franck                        078526043      26 personas
+    Talpin, Julien                         153121882       6 personas
+    Kieffer, Maxime                        236311212       7 personas
+    Bost, François                         05659643X       6 personas
+    Cobbaut, Jean-Philippe                 099528096      14 personas
+    Fléchet, Anaïs                         084278390       5 personas
+    Gibout, Christophe                     111200075      15 personas
+    Bertin-Elisabeth, Cécile               115305211      55 personas
+    Bestandji, Nabila                      166774391       6 personas
+    Le Meur, Pierre-Yves                   035271388      11 personas
+    Soresina, Marco                        03187312X       4 personas
+    Sabot, Philippe                        055755151       5 personas
+    Pierron, Jean-Philippe                 072478683      83 personas
+    Dos Santos, Graça                      060500255       5 personas
+    Blum, Françoise                        113567014      50 personas
+    Hardy, Andrew David                    074756184       6 personas
+    Dubos, Olivier                         055747728       5 personas
+    Savić, Bojan                           263971716       6 personas
+    Vermeren, Pierre                       056593953     151 personas
+    Pettinaroli, Laura                     142794643       4 personas
+    Lavigne, Jean-Philippe                 083907769      16 personas
+    Chrétien, Jean-Pierre                  026788667       5 personas
+    Dard, Olivier                          03392208X     109 personas
+    Derivois, Daniel                       071590218       8 personas
+    Horn, Gerd-Rainer                      05954581X       5 personas
+    Fula Rojas, Manuel Alejandro           193194147       6 personas
+    Parisot, Yolaine                       081054637     138 personas
+    Nativel, Didier                        078441633      81 personas
+    Simard, Martin                         188610952       7 personas
+    Guillemot, Didier                      138767017       8 personas
+    Bourdon, Jacques                       026745399       4 personas
+    Porée, Marc                            032718578       4 personas
+    Durix, Jean-Pierre                     026846519       4 personas
+    Huillery, Élise                        177916370       5 personas
+    Bordes-Benayoun, Chantal               02828173X       9 personas
+    Rolain, Jean-Marc                      067398413       7 personas
+    Herran, Néstor                        136225691       8 personas
+    Brunel, Pierre                         026756625       7 personas
+    Dufour, Suzanne                        162333064       5 personas
+    Alviar García, Helena                  176704361       4 personas
+    Pierré-Caps, Stéphane                  029297982      10 personas
+    Guénif Souilamas, Nacira               051625776     108 personas
+    Roche, Thierry                         118739174      50 personas
+    Jobard-Bachellier, Marie-Noëlle        028247108       5 personas
+    Matteudi, Emmanuel                     035174048       5 personas
+    Sendid, Boualem                        073461369      14 personas
+    Le Coadic, Ronan                       03551647X       5 personas
+    Goddard, Jean-Christophe               029103622      81 personas
+    Prochasson, Christophe                 029046564       5 personas
+    Fourie, Johan                          258090987       6 personas
+    Granier, Thierry                       033798966       5 personas
+    Lassus, Marie-Pierre                   030476119      26 personas
+    Dion, Michel-Pierre                    032041314      13 personas
+    Achcar, Gilbert                        050351141       5 personas
+    Vaïsse, Maurice                        027173828       6 personas
+    Naïm-Gesbert, Éric                     052645436      12 personas
+    Mollier, Jean-Yves                     027033732       3 personas
+    Niang, Sada                            027047318       7 personas
+    Gournay, Antoine                       077699629       5 personas
+    Timbrell, Charles                      264762770       5 personas
+    Revedin, Jana                          139975659       8 personas
+    Dyrendom Graugaard, Naja               282798463       8 personas
+    Carminati, Myriam                      052450074       4 personas
+    Rognon, Frédéric                       029121736       8 personas
+    Hourquebie, Fabrice                    057723338      80 personas
+    Ghosn, Catherine                       17502233X       4 personas
+    Sallantin, Jean                        028590317       5 personas
+    Vion, Antoine                          059863781       5 personas
+    Mathevet, Raphaël                      055791204      12 personas
+    Morisset, Lucie K.                     070431639       5 personas
+    Criqui, Étienne                        02873596X      13 personas
+    Askofaré, Sidi                         061627925       7 personas
+    Mages, Alexis                          130708925       5 personas
+    Roussel, Emmanuelle                    165451777       6 personas
+    Bident, Christophe                     035567503      13 personas
+    Cariou, Didier                         035389931       4 personas
+    Paccaud-Huguet, Josiane                030767369       4 personas
+    Desquilbet, Jean-Baptiste              11543660X       5 personas
+    Baubet, Thierry                        035326700       5 personas
+    Benquet, Marlène                       149496931       6 personas
+    Hernández, Gleider Ignacio             180633910       5 personas
+    Bouldoires, Alain                      059887397       6 personas
+    Dodane, Claire                         053909356       6 personas
+    Pairault, Thierry                      050853740       4 personas
+    Le Conte, Yves                         082686998      11 personas
+    Bessy, Olivier                         031060528      15 personas
+    Mathieu, Lilian                        032759967       5 personas
+    Poulet, Florian                        154169471       4 personas
+    Casenave, Jean                         106959867       6 personas
+    Rentzou, Efthymia                      069450846       5 personas
+    Otaola González, Paloma                074589660       7 personas
+    Noni, Georges de                       059665211       5 personas
+    Houseman, Michael                      070714800      39 personas
+    Guiselin, Emmanuel-Pie                 07725063X       8 personas
+    Jannière, Hélène                       067343155       5 personas
+    Rojo Hernández, Severiano              052584984       5 personas
+    Viveros, Mara                          080223192      53 personas
+    Lomonaco, Fabrizio                     029367697       8 personas
+    Coveney, John                          129194921       6 personas
+    Jacquot, Lionel                        077206460       6 personas
+    Banywesize, Emmanuel M.                120804158       4 personas
+    Braconnier, Patrice                    095874011       5 personas
+    Côme, Thierry                          031837859       5 personas
+    Berland-Berthon, Agnès                 08378358X       5 personas
+    Lagrée, Jacqueline                     026960885       4 personas
+    Lagarde, Christian                     029466539       9 personas
+    Roxin, Ioan                            082844941       5 personas
+    Gauzente, Claire                       052199142       5 personas
+    Bellio, Alfonsina                      249117622       7 personas
+    Génetiot, Alain                        034363181       5 personas
+    Lardon, Sylvie                         031424945       5 personas
+    Poussou, Jean-Pierre                   027081389       6 personas
+    Göle, Nilüfer                          032188900       5 personas
+    Voelke, Pierre                         069900086       6 personas
+    Paquot, Thierry                        027057720      39 personas
+    Dupuis, Marc                           02684494X       5 personas
+    Balmelle, Catherine                    05859583X       5 personas
+    Mondot, Jean                           033347034       4 personas
+    Segond, Frédérique                     069068151       6 personas
+    Rollet, Anne                           086132504       7 personas
+    Dondin-Payre, Monique                  026834626       5 personas
+    Delory-Momberger, Christine            031157122       5 personas
+    Mengès-Le Pape, Christine              111349621       7 personas
+    Caradec, Vincent                       034574174       6 personas
+    Sicot, François                        059205660       5 personas
+    Treuillet, Sylvie                      147354285      13 personas
+    Castandet, Benoît                      149392613       8 personas
+    Durriez, Didier                        277400864       6 personas
+    Favrel, Joël                           069098069       6 personas
+    Cambon, Aimé                           176945911       6 personas
+    Quentin, Philippe                      066900727       5 personas
+    Dubourdieu, Denis                      058634673       5 personas
+    Delmas, C.                             291505244       8 personas
+    Séguier, Guy                           027130886       5 personas
+    Chedik, Lisa                           221619275       6 personas
+    Celhay, Franck                         112645526       6 personas
+    Titli, André                           059937823       7 personas
+    Rueher, Michel                         067110738       5 personas
+    Reiffsteck, Philippe                   11190188X       8 personas
+    Lancret, Nathalie                      035521058       5 personas
+    Zavadil, Jiri                          199292175       9 personas
+    Nguyen, Benjamin                       07790821X       6 personas
+    Stankovic, Milan                       171365003       8 personas
+    Leng, Jacques                          150134320       4 personas
+    Bousseau, Adrien                       13854459X      12 personas
+    Iung, Claude                           071524746       8 personas
+    Silberzan, Pascal                      092863728       6 personas
+    Pernelle, Nathalie                     124298095      12 personas
+    Colin, René-Pierre                     02679425X       4 personas
+    Thiebaut, Jean-Marie                   171605586       4 personas
+    Durance, Philippe                      034749098       5 personas
+    Lucas-Leclin, Gaelle                   16069017X       6 personas
+    Dao, Tien-Tuan                         144811944       4 personas
+    Duval, Marc                            076701085       9 personas
+    Ammar, Amine                           080727190       6 personas
+    Noël, Frédéric                         112926738       3 personas
+    Aparicio, Marc                         183374223       5 personas
+    Odedeyi, Temitope                      285455869       7 personas
+    Chadebec, Olivier                      11501022X       5 personas
+    Naït-Ali, Amine                        11381304X       9 personas
+    Weber, Philippe                        029133823       3 personas
+    Douek, Philippe                        050693255       3 personas
+    Koutsouris, Dionissios                 032760051       6 personas
+    Bernengo, Jean-Claude                  130031585       6 personas
+    Lutz, Philippe                         084305428       6 personas
+    Bonfait, Olivier                       033671931       4 personas
+    Martinez Bolivar, Ivan Marino          256436738       7 personas
+    Di Renzo, Marco                        176504796       6 personas
+    Rouan, Daniel                          083870415       6 personas
+    Abbes, Dhaker                          180809512      12 personas
+    Sachot, Maurice                        028290038       3 personas
+    Rui, Sandrine                          058940987       7 personas
+    Biron, David G.                        175100837       6 personas
+    Potdevin-Caumond, Audrey               119631776       6 personas
+    Grieve, Kate                           268922497       6 personas
+    Boutry, Nicolas                        201319268       5 personas
+    Sallaberry, Arnaud                     156548844       6 personas
+    Bourdel, Nicolas                       118602071       5 personas
+    Sigaud, Olivier                        072724714       6 personas
+    Kolski, Christophe                     032302800      11 personas
+    Montcouquiol, Mireille                 149347669       4 personas
+    Bretier, Philippe                      155805010       7 personas
+    Ababsa, Fakhr-Eddine                   083927174       7 personas
+    Michon, Camille                        169601102       7 personas
+    Troncoso Lora, Alicia                  251663264       4 personas
+    Rousseau, David                        092104630      11 personas
+    Markhoff, Béatrice                     110533569       7 personas
+    Audet, Jean                            285397958       7 personas
+    Jacqmin-Gadda, Hélène                  071654925      11 personas
+    Mouratidis, Haralambos                 155058819       5 personas
+    Marrelec, Guillaume                    078819083       8 personas
+    Elegant, Lucien                        074518976      12 personas
+    Hou, Kun-Mean                          136658830       7 personas
+    Noël, Vincent                          168514192       8 personas
+    Anwer, Nabil                           183726170       5 personas
+    Tannier, Cécile                        059840218       7 personas
+    Hirche, Sandra                         223354236       6 personas
+    Li, Ke                                 183102991       6 personas
+    Saurin, Andrew                         197683851       6 personas
+    Outbib, Rachid                         112522769      13 personas
+    Clofent-Sanchez, Gisèle                060313013       6 personas
+    Morère, Yann                           147754046       7 personas
+    Volland, Hervé                         165643390      11 personas
+    Lapayre, Jean-Christophe               098491725       4 personas
+    Vitry, Catherine de                    137817142       7 personas
+    Zheng, Gang                            123437709       7 personas
+    Ravat, Franck                          127663711       6 personas
+    Levasseur, Anthony                     131215256       7 personas
+    Nüsse, Oliver                          119173867       7 personas
+    Campo, Éric                            095254250       5 personas
+    Alberio, Marco                         182083608       6 personas
+    Teychené, Sébastien                    083875654       7 personas
+    Hazzan, Marc                           103210490       6 personas
+    Abi Zeid Daou, Roy                     161032575       7 personas
+    Masiello, Emiliano                     083626670       9 personas
+    Härri, Jérôme                          178608734       7 personas
+    Latouche, Karine                       081070861       7 personas
+    Schmidt, Géraldine                     033946787      20 personas
+    Quenan, Carlos                         034867473       7 personas
+    Serrano Archimi, Carolina              147572584       6 personas
+    Barles, Sabine                         034389121      22 personas
+    Rousseau, Amélie                       08554129X       4 personas
+    Drummond, France                       059441844       4 personas
+    Marché, Claude                         069480249       7 personas
+    Boujdaria, Kaïs                        227137590       6 personas
+    Spaëth, Valérie                        057649634      40 personas
+    Gutkin, Boris                          167088955       5 personas
+    Zaraket, Haitham                       174209630       9 personas
+    Demazière, Christophe                  034753540       5 personas
+    Nahon, Laurent                         153498587       7 personas
+    Macpherson, Dugald                     081862857       7 personas
+    Huysentruyt, Marieke                   291913202       5 personas
+    Vivien, Franck-Dominique               033709017      10 personas
+    Rowe, Christopher James                028530284       6 personas
+    Parmentier, Élisabeth                  05940714X       4 personas
+    Caumon, Céline                         097567078       7 personas
+    Hanse, Olivier                         080877117       6 personas
+    Micheau, Michel                        121830047       7 personas
+    Oliva Martínez, J. Daniel              103901221       6 personas
+    Coupaye, Ludovic                       149789084       6 personas
+    Costalat-Founeau, Anne-Marie           035104414       5 personas
+    Castra, Michel                         069919275       5 personas
+    Bernard-Maugiron, Nathalie             054324793       5 personas
+    Amilhat-Szary, Anne-Laure              079449298      91 personas
+    Briole, Alain                          078013917       5 personas
+    Marcel, Jean-François                  069168954       5 personas
+    Flécheux, Céline                       098742469       7 personas
+    Michelot, Agnès                        060984759       8 personas
+    Emery, Bernard                         029399564       5 personas
+
+--------------------------------------------------------------------------
+COMPLETITUD
+--------------------------------------------------------------------------
+Mide que analisis se pueden hacer sobre ESTE corpus. NO mide si
+theses.fr tiene lagunas: eso depende de que cada institucion haya
+depositado y no se puede comprobar desde la API.
+
+Cobertura de PPN en miembros de tribunal:
+  con PPN:  4324
+  sin PPN:  838
+  cobertura: 83.8%
+
+  Es el TECHO de las metricas de persistencia: quien no trae PPN
+  no entra en el conteo, y cotejar por nombre no es alternativa
+  porque nombre y apellido aparecen invertidos en parte de los
+  registros de theses.fr (Aboucaya & Jasim, 2026).
+
+  La cobertura NO es aleatoria: la composicion del tribunal falta
+  de forma sistematica en el material antiguo. Cobertura por anho:
+    1985   50.0%
+    1986   57.1%
+    1987   50.0%
+    1988   57.9%
+    1989   53.8%
+    1990   59.3%
+    1991   48.3%
+    1992   58.2%
+    1993   58.0%
+    1994   63.6%
+    1995   55.1%
+    1996   62.9%
+    1997   58.1%
+    1998   50.0%
+    1999   53.3%
+    2000   55.4%
+    2001   47.8%
+    2002   56.5%
+    2003   58.3%
+    2004   64.3%
+    2005   51.0%
+    2006   58.6%
+    2007   57.4%
+    2008   63.1%
+    2009   68.3%
+    2010   65.3%
+    2011   78.8%
+    2012   79.4%
+    2013   78.4%
+    2014   92.3%
+    2015   94.6%
+    2016   96.7%
+    2017   91.5%
+    2018   96.8%
+    2019   97.8%
+    2020   93.4%
+    2021   97.4%
+    2022   98.4%
+    2023   99.5%
+    2024   99.2%
+    2025   99.4%
+    2026  100.0%
+
+Proporcion rellena por columna (de menor a mayor):
+  datePremiereInscriptionDoctorat             0    0.0%
+  validado                                    0    0.0%
+  motivo                                      0    0.0%
+  notas                                       0    0.0%
+  rapporteurs                               567   43.8%
+  doi                                       626   48.4%
+  examinateurs                              634   49.0%
+  partenairesDeRecherche                    658   50.9%
+  ecolesDoctorale                           665   51.4%
+  sujets                                    760   58.7%
+  titreEN                                  1176   90.9%
+  sujetsRameau                             1178   91.0%
+  resumen                                  1281   99.0%
+  resumen_idioma                           1281   99.0%
+  etabSoutenancePpn                        1292   99.8%
+  diccionario                              1294  100.0%
+  keyword_origen                           1294  100.0%
+  nucleo                                   1294  100.0%
+  tipo_busqueda                            1294  100.0%
+  corrida_origen                           1294  100.0%
+  id                                       1294  100.0%
+  nnt                                      1294  100.0%
+  titrePrincipal                           1294  100.0%
+  discipline                               1294  100.0%
+  status                                   1294  100.0%
+  dateSoutenance                           1294  100.0%
+  auteurs                                  1294  100.0%
+  directeurs                               1294  100.0%
+  president                                1294  100.0%
+  etabSoutenanceN                          1294  100.0%
+
+Contradicciones internas del registro:
+  Un valor 'sin datos' NO significa que no haya contradicciones,
+  sino que la columna necesaria esta vacia en todo el corpus y la
+  comprobacion no se pudo hacer.
+
+  status defendida sin NNT:              0
+  defensa anterior a la inscripcion:     sin datos
+  tesis sin autor:                       0
+  tesis sin fecha de defensa:            0
+  OMITIDA: defensa_antes_de_inscripcion (la columna 'datePremiereInscriptionDoctorat' esta presente pero VACIA en todo el corpus: no es que no haya contradicciones, es que no se puede comprobar)
+
+Sesgo de la fecha 1 de enero:
+  tesis con fecha 01-01:  668 de 1294 (51.6%)
+  Las tesis impresas de las que solo se conoce el anho se
+  registran como AAAA-01-01. Esto no corrige nada: mide cuanto
+  pesa el artefacto al leer la granularidad de las fechas.
+  Por decada:
+    1980s      76
+    1990s     300
+    2000s     232
+    2010s      60
+
+--------------------------------------------------------------------------
+COMPARACION CONTRA EL INDICE DE THESES.FR
+--------------------------------------------------------------------------
+Referencia: el indice acotado a 1985-2026 (498,051 registros).
+
+_exists_ dice si el campo esta presente, no si el contenido
+sirve: un resumen de diez palabras cuenta igual que uno de mil.
+
+campo                              corpus   indice     dif.
+resumes.fr                          99.0%    86.5%   +12.5
+nnt                                100.0%    97.8%    +2.2
+discipline                         100.0%   100.0%    +0.0
+datePremiereInscriptionDoctorat      0.0%     1.6%    -1.6
+etabSoutenanceN                    100.0%   100.0%    +0.0
+sujetsLibelle                       58.7%    59.0%    -0.3
+sujetsRameauLibelle                 91.0%    79.6%   +11.4
+
+--------------------------------------------------------------------------
+NOTA SOBRE DATOS PERSONALES
+--------------------------------------------------------------------------
+Los rankings de personas y la red de co-participacion son datos
+personales de personas identificables. La red revela relaciones que
+ninguna ficha individual contiene: es informacion NUEVA sobre gente
+concreta, no una reorganizacion de lo publicado.
+
+Abes publica los nombres al amparo del articulo 89.1 del RGPD. Eso
+cubre la fuente, no necesariamente lo que se derive de ella.
+Sustituir nombres por PPN no anonimiza: el PPN es publico y
+resoluble en idref.fr.
+
+Licencia de los datos: Licence Ouverte / Open Licence 2.0 (Etalab).
+Atribucion exigida: Agence bibliographique de l'enseignement superieur.
+
+==========================================================================
+FIN DEL INFORME
+==========================================================================

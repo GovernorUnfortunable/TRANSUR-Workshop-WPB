@@ -1,0 +1,166 @@
+WPB_TESIS_S01_busqueda v0.6
+Corrida: 2026-08-30T12:30:50
+Iteracion: 001
+Diccionario: keywords (diccionarios/palabras_clave_tesis.csv)
+
+DICCIONARIO
+  filas totales:            7
+  filas activas:            6
+  filas omitidas:           1  (seleccionado != 1)
+
+CONSULTAS
+  lanzadas:                 6
+  fallidas:                 0
+  campos de busqueda:       titres.\*, resumes.\*, sujetsLibelle, sujetsRameauLibelle
+  filtros globales:         status:(soutenue)
+
+RESULTADOS
+  candidatos unicos:        1294
+  con anotaciones previas:  0
+  nuevos en esta corrida:   1294
+
+INTERVENCIONES SOBRE EL DATO
+  terminos escapados:       1
+  valores saneados:         1745
+  validado no reconocido:   0
+
+DEFAULTS APLICADOS POR CLAVE AUSENTE EN EL YAML
+  ninguno
+
+TERMINOS QUE REQUIRIERON ESCAPE
+  Quilombo-Territorium
+
+ATRIBUCION DE LOS DATOS
+  Agence bibliographique de l'enseignement superieur (Abes)
+  Licence Ouverte / Open Licence 2.0 (Etalab)
+
+============================================================
+INFORME DEL SONDEO PREVIO
+============================================================
+
+==========================================================================
+SONDEO PREVIO -- totales por fila del diccionario
+==========================================================================
+keyword                       totalHits terminos
+--------------------------------------------------------------------------
+decolonial                          694       12
+conviviality                        494        7
+teoria de la dependencia             51        7
+buen vivir                           54        8
+pluriverso                            7        9
+quilombo                              7        8
+--------------------------------------------------------------------------
+suma (con solapamiento)           1,307
+
+Los totales por fila NO son aditivos: dos filas pueden recuperar
+la misma tesis. El total unico se conoce al recuperar.
+
+==========================================================================
+TERMINOS QUE CONVIENE REVISAR (16)
+==========================================================================
+
+  [decolonial] termino: 'Dekolonialität'
+      0 resultados, 0% de su fila
+      - no aparece en el indice: el sinonimo sobra
+      por campo: titres.\*=0  resumes.\*=0  sujetsLibelle=0  sujetsRameauLibelle=0
+
+  [decolonial] termino: 'dekolonial'
+      0 resultados, 0% de su fila
+      - no aparece en el indice: el sinonimo sobra
+      por campo: titres.\*=0  resumes.\*=0  sujetsLibelle=0  sujetsRameauLibelle=0
+
+  [conviviality] termino: 'convivencialidad'
+      0 resultados, 0% de su fila
+      - no aparece en el indice: el sinonimo sobra
+      por campo: titres.\*=0  resumes.\*=0  sujetsLibelle=0  sujetsRameauLibelle=0
+
+  [teoria de la dependencia] termino: 'Dependenztheorie'
+      0 resultados, 0% de su fila
+      - no aparece en el indice: el sinonimo sobra
+      por campo: titres.\*=0  resumes.\*=0  sujetsLibelle=0  sujetsRameauLibelle=0
+
+  [teoria de la dependencia] termino: 'teoria dependencia'
+      0 resultados, 0% de su fila
+      - no aparece en el indice: el sinonimo sobra
+      por campo: titres.\*=0  resumes.\*=0  sujetsLibelle=0  sujetsRameauLibelle=0
+
+  [teoria de la dependencia] termino: 'dependentista'
+      0 resultados, 0% de su fila
+      - no aparece en el indice: el sinonimo sobra
+      por campo: titres.\*=0  resumes.\*=0  sujetsLibelle=0  sujetsRameauLibelle=0
+
+  [buen vivir] termino: 'sumaq kausay'
+      0 resultados, 0% de su fila
+      - no aparece en el indice: el sinonimo sobra
+      por campo: titres.\*=0  resumes.\*=0  sujetsLibelle=0  sujetsRameauLibelle=0
+
+  [buen vivir] termino: 'buen vivir andino'
+      0 resultados, 0% de su fila
+      - no aparece en el indice: el sinonimo sobra
+      por campo: titres.\*=0  resumes.\*=0  sujetsLibelle=0  sujetsRameauLibelle=0
+
+  [pluriverso] termino: 'pluriversalidad'
+      0 resultados, 0% de su fila
+      - no aparece en el indice: el sinonimo sobra
+      por campo: titres.\*=0  resumes.\*=0  sujetsLibelle=0  sujetsRameauLibelle=0
+
+  [pluriverso] termino: 'pluriversalisme'
+      0 resultados, 0% de su fila
+      - no aparece en el indice: el sinonimo sobra
+      por campo: titres.\*=0  resumes.\*=0  sujetsLibelle=0  sujetsRameauLibelle=0
+
+  [pluriverso] termino: 'Pluriversum'
+      0 resultados, 0% de su fila
+      - no aparece en el indice: el sinonimo sobra
+      por campo: titres.\*=0  resumes.\*=0  sujetsLibelle=0  sujetsRameauLibelle=0
+
+  [pluriverso] termino: 'pluriversale'
+      0 resultados, 0% de su fila
+      - no aparece en el indice: el sinonimo sobra
+      por campo: titres.\*=0  resumes.\*=0  sujetsLibelle=0  sujetsRameauLibelle=0
+
+  [pluriverso] termino: 'pluriversalen'
+      0 resultados, 0% de su fila
+      - no aparece en el indice: el sinonimo sobra
+      por campo: titres.\*=0  resumes.\*=0  sujetsLibelle=0  sujetsRameauLibelle=0
+
+  [quilombo] termino: 'território quilombola'
+      0 resultados, 0% de su fila
+      - no aparece en el indice: el sinonimo sobra
+      por campo: titres.\*=0  resumes.\*=0  sujetsLibelle=0  sujetsRameauLibelle=0
+
+  [quilombo] termino: 'terre quilombola'
+      0 resultados, 0% de su fila
+      - no aparece en el indice: el sinonimo sobra
+      por campo: titres.\*=0  resumes.\*=0  sujetsLibelle=0  sujetsRameauLibelle=0
+
+  [quilombo] termino: 'Quilombo-Territorium'
+      0 resultados, 0% de su fila
+      - no aparece en el indice: el sinonimo sobra
+      por campo: titres.\*=0  resumes.\*=0  sujetsLibelle=0  sujetsRameauLibelle=0
+
+--------------------------------------------------------------------------
+QUE HACER CON ESTO
+--------------------------------------------------------------------------
+
+Un termino que domina su fila suele ser mas general que el concepto que se
+quiere recuperar. Casos tipicos en este corpus:
+
+  - El nombre de un proceso historico usado como sinonimo de una corriente
+    teorica. En una base de tesis francesas, 'decolonisation' recupera toda
+    la historiografia del imperio, no la teoria decolonial.
+
+  - Una palabra corriente de la lengua usada como termino tecnico.
+    'convivialite' es vocabulario comun del frances.
+
+Si el desglose por campo muestra que el volumen viene de resumes, conviene
+apagar ese campo para la busqueda: una mencion de pasada en el resumen pesa
+igual que el tema de la tesis. Se puede seguir recuperando el resumen para
+la validacion sin interrogarlo.
+
+Opciones, de menos a mas invasiva:
+  1. Quitar el termino del diccionario.
+  2. Moverlo a una fila propia, con su nucleo, para poder validarlo aparte.
+  3. Apagar resumes en campos_busqueda.palabras_clave.
+  4. Acotar el periodo o la disciplina en filtros.
+

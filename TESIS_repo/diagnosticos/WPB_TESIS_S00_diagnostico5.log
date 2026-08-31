@@ -1,0 +1,17 @@
+2026-08-29 19:12:37,284 [INFO] ======================================================================
+2026-08-29 19:12:37,284 [INFO] WPB_TESIS_S00_diagnostico5 v0.5 -- inicio
+2026-08-29 19:12:37,465 [INFO] titres   | titres.fr (control ronda 3)        | HTTP 200 | total=44
+2026-08-29 19:12:38,665 [INFO] titres   | titres.* (el que fallo)            | HTTP 400 | total=None
+2026-08-29 19:12:39,881 [INFO] titres   | titres.\* (asterisco escapado)     | HTTP 200 | total=51
+2026-08-29 19:12:41,075 [INFO] titres   | titres (campo base)                | HTTP 200 | total=0
+2026-08-29 19:12:42,267 [INFO] resumes  | resumes.fr (control ronda 3)       | HTTP 200 | total=165
+2026-08-29 19:12:43,455 [INFO] resumes  | resumes.* (el que fallo)           | HTTP 400 | total=None
+2026-08-29 19:12:44,666 [INFO] resumes  | resumes.\* (escapado)              | HTTP 200 | total=180
+2026-08-29 19:12:45,846 [INFO] resumes  | resumes (campo base)               | HTTP 200 | total=0
+2026-08-29 19:12:47,033 [INFO] filtro   | campo verificado sin status        | HTTP 200 | total=63
+2026-08-29 19:12:48,235 [INFO] filtro   | campo verificado CON status        | HTTP 200 | total=34
+2026-08-29 19:12:49,427 [INFO] filtro   | dos campos verificados con status  | HTTP 200 | total=34
+2026-08-29 19:12:50,623 [INFO] escape   | frase sin caracteres especiales    | HTTP 200 | total=1
+2026-08-29 19:12:51,820 [INFO] escape   | guion escapado dentro de comillas  | HTTP 200 | total=1
+2026-08-29 19:12:53,069 [INFO] escape   | guion sin escapar dentro de comillas | HTTP 200 | total=1
+2026-08-29 19:12:54,072 [INFO] Fin de la quinta ronda. Registro en WPB_TESIS_S00_diagnostico5.log

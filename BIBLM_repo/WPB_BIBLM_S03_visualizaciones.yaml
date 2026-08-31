@@ -1,0 +1,156 @@
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# WPB_BIBLM_S03 — Configuración de visualizaciones
+# Script: WPB_BIBLM_S03_visualizaciones.py (v0.2)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#
+# COMO CORRER
+# ───────────
+# Requisitos: Python 3.8+ con pandas, matplotlib, pyyaml
+#
+#   macOS / Linux:
+#     python3 -m pip install pandas matplotlib pyyaml
+#     cd /ruta/al/proyecto
+#     python3 WPB_BIBLM_S03_visualizaciones.py --config WPB_BIBLM_S03_visualizaciones.yaml
+#
+#   Windows (PowerShell o CMD):
+#     py -m pip install pandas matplotlib pyyaml
+#     cd C:\ruta\al\proyecto
+#     py -X utf8 WPB_BIBLM_S03_visualizaciones.py --config WPB_BIBLM_S03_visualizaciones.yaml
+#
+# Agregar --force para sobrescribir sin pedir confirmación.
+# Usar --csv-dir para cambiar el directorio donde busca los CSVs de S02.
+#
+# ORDEN DE EJECUCIÓN
+# ──────────────────
+#   S01 (recuperación) --> S02 (estadísticas) --> S03 (gráficos)
+#
+# QUÉ GENERA
+# ──────────
+# Siete visualizaciones automáticas:
+#
+#   1. individual_[keyword].png  Una por palabra clave: FR vs DE juntas
+#                                Cuatro métricas: docs/año (barras), acumulado,
+#                                LCC%, newcomers% (líneas)
+#
+#   2-3. all_keywords_[PAÍS].png Todas las palabras clave en Francia / Alemania
+#                                Métrica: documentos anuales (líneas)
+#
+#   4-5. top3_[PAÍS].png         Top 3 por documento acumulado, por país
+#
+#   6-7. rest_[PAÍS].png         Resto de palabras clave (excluyendo top 3)
+#
+# LA ITERACIÓN LA DEFINE S02
+# ─────────────────────────
+# Este archivo NO declara metadata.iteracion. El número se deriva del nombre
+# de los CSVs de entrada. Para visualizar otra iteración, apuntar --csv-dir
+# al directorio con los CSVs correspondientes.
+#
+# PALETA DE COLORES
+# ─────────────────
+# Tres formatos aceptados para colores.paleta:
+#
+#   a) URL de coolors.co (pegar directo):
+#      paleta: "https://coolors.co/264653-2a9d8f-e9c46a-f4a261-e76f51"
+#   b) Lista de códigos hex (con o sin #):
+#      paleta: ["#264653", "#2a9d8f", "#e9c46a", "#f4a261", "#e76f51"]
+#   c) null / ausente → usa colormap tab20 de matplotlib (defecto)
+#
+# Si la paleta tiene MENOS colores que keywords, automáticamente fallback a
+# tab20 para garantizar coherencia entre gráficos.
+#
+# COLOR FIJO POR KEYWORD
+# ─────────────────────
+# Una vez asignados los colores al inicio, cada palabra clave usa siempre el
+# mismo color en TODOS los gráficos. Apariciones de 'decolonial' son siempre
+# del mismo color, en individual_decolonial, all_keywords_FR, top3_DE, etc.
+#
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+metadata:
+  descripcion: "Configuración de visualizaciones"
+  proyecto: "TRANSUR Work Package B — Análisis de circulación académica decolonial"
+  fecha_creacion: "2026-08-21"
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# SALIDA
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+salida:
+  directorio: "output"
+
+  # Formato(s) de los gráficos generados: png | svg | pdf
+  # Pueden ser uno o varios: los que se declaren se generan.
+  #   png → raster (ideal para revisión rápida y documentos)
+  #   svg → vectorial (ideal para edición posterior, ej. Inkscape/Illustrator)
+  #   pdf → vectorial (ideal para inclusión en LaTeX)
+  formato:
+    - "png"    # generar PNG (+ SVG si lo comentarías y agregaras svg)
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# PARÁMETROS GLOBALES
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+global:
+  # Estilo de figura (global para todos los gráficos)
+  figsize: [14, 7]         # [ancho, alto] en pulgadas
+  fontsize_title: 14
+  fontsize_labels: 11
+  fontsize_legend: 10
+  dpi_figure: 300
+
+  # ── PERÍODO DE VISUALIZACIÓN (NO IMPLEMENTADO) ──
+  # Para recortar la ventana de años, usa periodo_analisis.habilitado en S02.
+  # S03 visualiza lo que S02 produce: si querés una ventana más estrecha,
+  # recortá el corpus en S02, no en S03.
+  # Implementación futura: si S03 necesita una ventana diferente sin
+  # recalcular, se agregaría aquí.
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# PALETA DE COLORES
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+colores:
+  # Paleta OPERATIVA para gráficos multi-keyword (comparativos)
+  # Tres formatos aceptados (ver documentación en "PALETA DE COLORES" arriba):
+  #   URL coolors.co: "https://coolors.co/c08497-f6efa6-564d4a-62929e-72a98f"
+  #   Lista hex:      ["#c08497", "#f6efa6", "#564d4a", "#62929e", "#72a98f"]
+  #   null/ausente:   (usa tab20 de matplotlib)
+  #
+  # IMPORTANTE: si hay más keywords que colores en la paleta, automáticamente
+  # fallback a tab20 completo. Asegura consistencia entre gráficos.
+  paleta: "https://coolors.co/c08497-f6efa6-564d4a-62929e-72a98f"
+
+  # ── ESTILOS (NO IMPLEMENTADO) ──
+  # El script lee esta sección pero no la aplica al código.
+  # Es documentación de futuro: cuándo los estilos funcionen (por ejemplo,
+  # si se parametrizan los tipos de línea, marcadores, etc.), aquí iría
+  # la configuración.
+  individual:
+    n_docs_anual:
+      tipo: "bar"
+      color: "#bdc3c7"
+      alpha: 0.8
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# LOGGING
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+logging:
+  # Nivel de la salida por CONSOLA: DEBUG | INFO | WARNING | ERROR
+  # El archivo de log siempre registra en DEBUG.
+  nivel: "INFO"
+
+  # false → no se escribe archivo de log, solo consola
+  archivo_log: true
+
+  # El log se escribe en salida.directorio, junto a los gráficos.
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# REFERENCIAS
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# Visualización:
+#   - Milia (2026): Rewiring vs Reconfiguration, Figura 10.2
+#
+# Estándar de documentación:
+#   - Rule et al. (2019): Ten simple rules for writing and sharing computational
+#     analyses in Jupyter Notebooks. https://doi.org/10.1371/journal.pcbi.1007007
+#
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# FIN DE CONFIGURACIÓN
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

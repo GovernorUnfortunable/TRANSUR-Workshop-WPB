@@ -1,0 +1,13 @@
+2026-08-29 13:18:11,988 [INFO] ======================================================================
+2026-08-29 13:18:11,988 [INFO] WPB_TESIS_S00_diagnostico2 v0.2 -- inicio
+2026-08-29 13:18:11,988 [INFO] Contacto declarado en User-Agent: tu@correo.org
+2026-08-29 13:18:12,252 [INFO] P1 | directo (control)          | total=7 | q=sujetsLibelle:("buen vivir")
+2026-08-29 13:18:13,470 [INFO] P1 | invertido                  | total=0 | q=sujetsLibelle:("vivir buen")
+2026-08-29 13:18:14,660 [INFO] P4a | titres.fr / base           | total=44 | q=titres.fr:(decolonial)
+2026-08-29 13:18:15,862 [INFO] P4a | titres.fr / flexion        | total=4 | q=titres.fr:(decolonialite)
+2026-08-29 13:18:17,056 [INFO] P4a | titrePrincipal / base      | total=5 | q=titrePrincipal:(decolonial)
+2026-08-29 13:18:18,262 [INFO] P4a | titrePrincipal / flexion   | total=0 | q=titrePrincipal:(decolonialite)
+2026-08-29 13:18:19,485 [INFO] P4b | _exists_ titrePrincipal    | total=563718 | q=_exists_:titrePrincipal
+2026-08-29 13:18:20,703 [INFO] P4b | _exists_ titres.fr         | total=555485 | q=_exists_:titres.fr
+2026-08-29 13:18:22,571 [INFO] P4b | sin filtro (control)       | total=563719 | q=*
+2026-08-29 13:18:23,573 [INFO] Fin de la segunda ronda. Registro en WPB_TESIS_S00_diagnostico2.log

@@ -1,0 +1,247 @@
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# WPB_BIBLM_S02 — Configuración de análisis de estadísticas
+# Script: WPB_BIBLM_S02_analisis.py (v0.2)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#
+# COMO CORRER
+# ───────────
+# Requisitos: Python 3.8+ con pandas, pyyaml y networkx
+#
+#   macOS / Linux:
+#     python3 -m pip install pandas pyyaml networkx
+#     cd /ruta/al/proyecto
+#     python3 WPB_BIBLM_S02_analisis.py --config WPB_BIBLM_S02_analisis.yaml
+#
+#   Windows (PowerShell o CMD):
+#     py -m pip install pandas pyyaml networkx
+#     cd C:\ruta\al\proyecto
+#     py -X utf8 WPB_BIBLM_S02_analisis.py --config WPB_BIBLM_S02_analisis.yaml
+#
+# Agregar --force para sobrescribir sin pedir confirmación.
+#
+# ORDEN DE EJECUCIÓN
+# ──────────────────
+#   S01 (recuperación) --> S02 (estadísticas) --> S03 (gráficos)
+#
+# S02 requiere que S01 haya corrido antes: lee su CSV principal.
+# S03 lee los CSV que produce S02.
+#
+# LA ITERACIÓN LA DEFINE S01
+# ──────────────────────────
+# Este archivo NO declara metadata.iteracion. El número se deriva del nombre
+# del CSV de entrada: de WPB_BIBLM_003_v3.0.csv, S02 deduce la iteración 003
+# y nombra sus salidas WPB_BIBLM_003_STATS_...
+#
+# Para analizar otra iteración, apuntar entrada.csv_principal al CSV
+# correspondiente. No hay ningún número que actualizar a mano.
+#
+# ARCHIVOS QUE GENERA
+# ───────────────────
+# En salida.directorio, con prefijo WPB_BIBLM_{iteracion:03d}_
+#
+#   _STATS_<palabra>_<PAIS>.csv      Serie anual de métricas (entrada de S03)
+#   _STATS_<palabra>_<PAIS>.txt      Resumen legible de lo mismo
+#   _SOLAPAMIENTO_KEYWORDS.csv       Documentos recuperados por varias palabras
+#   _S02_config_usado.yaml           Copia de este archivo (trazabilidad)
+#   _S02_ejecucion.log               Log; se acumula con separador por corrida
+#
+# SOLAPAMIENTO ENTRE PALABRAS CLAVE
+# ─────────────────────────────────
+# Desde S01 v0.6 un documento puede pertenecer a varias palabras clave: si lo
+# recuperaron 'decolonial' y 'quilombo', entra en las estadísticas de las dos.
+# La suma de los subcorpus SUPERA el tamaño del corpus, y eso es correcto.
+# El log informa cuántos documentos están en esa situación y el CSV de
+# solapamiento dice exactamente cuáles.
+#
+# RUTAS
+# ─────
+# Los directorios se resuelven contra el directorio desde el que se ejecuta el
+# script, no contra la ubicación del .py. Usar siempre barra normal (/).
+#
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+metadata:
+  descripcion: "Análisis de estadísticas por término y país"
+  proyecto: "TRANSUR Work Package B — Análisis de circulación académica decolonial"
+  fecha_creacion: "2026-08-21"
+  # iteracion: la define S01 y se deriva del nombre del CSV de entrada
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# ENTRADA
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# El script lee: directorio_entrada / csv_principal
+# Debe ser el CSV PRINCIPAL de S01, no un export por palabra clave: S02
+# necesita las columnas keyword_origen, publication_year y author_countries.
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+entrada:
+  csv_principal: "WPB_BIBLM_000_v0.0.csv"
+  directorio_entrada: "output"
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# SALIDA
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+salida:
+  directorio: "output"
+
+  formatos:
+    csv: true   # Serie anual. S03 los necesita: con false no habrá gráficos
+    txt: true   # Resumen legible; no lo consume ningún otro script
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# FILTROS
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+filtros:
+  # true  → procesa todas las palabras clave presentes en el corpus
+  # false → procesa solo las de keywords_seleccionados
+  procesar_todos: true
+
+  # Se usa solo si procesar_todos es false. Las que no estén en el corpus
+  # se informan por log y se saltan.
+  keywords_seleccionados: []
+
+  # Un documento con autores en ambos países se cuenta en los dos.
+  paises:
+    - "FR"
+    - "DE"
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# RECORTE TEMPORAL DEL CORPUS DE ANÁLISIS
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# Descarta los documentos fuera del período ANTES de calcular nada.
+#
+# HAY TRES LUGARES DONDE SE PUEDE RECORTAR EL TIEMPO, y no son equivalentes:
+#
+#   S01, filtros.periodo_*     No descarga los datos. Irreversible sin
+#                              volver a consultar OpenAlex.
+#   S02, este bloque           Redefine el corpus de análisis. Las métricas
+#                              se calculan sobre el período recortado.
+#   S03, global.periodo_*      Solo la ventana del gráfico. No recalcula.
+#
+# CUÁL USAR
+#
+# Para ver una ventana de un proceso que empezó antes → recortar en S03
+# y dejar este bloque en false. Es lo habitual.
+#
+# Para que el análisis SEA sobre el período → activar acá. Tiene sentido si
+# el período es el objeto de estudio y no un recorte de lectura.
+#
+# QUÉ CAMBIA AL RECORTAR ACÁ
+#
+# Estas cuatro métricas dan igual en los tres lugares, porque se calculan
+# año por año: n_docs_anual, pct_total_anual, n_autores_distintos,
+# largest_component_size_pct.
+#
+# Estas dos NO:
+#   n_docs_acumulado  arranca en cero al inicio del período, en vez de
+#                     entrar con el valor histórico que el término traía.
+#   newcomers_pct     'nuevo' pasa a significar 'nuevo en el período': un
+#                     autor que publicó en 1995 y reaparece en 2005 cuenta
+#                     como nuevo, porque su aparición previa quedó fuera.
+#
+# Los CSV y TXT de una corrida recortada NO son comparables con los de una
+# corrida sin recorte. El log y el encabezado de cada TXT lo advierten.
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+periodo_analisis:
+  habilitado: true
+
+  # Ambos son inclusivos. Se puede declarar solo uno: dejar el otro en null
+  # deja ese extremo abierto. Los documentos sin año se excluyen al recortar.
+  inicio: 2000
+  fin: 2026
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# MÉTRICAS
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# Cada métrica en false se omite del cálculo y NO aparece como columna en el
+# CSV. Tener en cuenta que S03 espera n_docs_anual, n_docs_acumulado,
+# largest_component_size_pct y newcomers_pct para los gráficos individuales.
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+metricas:
+  n_docs_anual: true          # Documentos publicados ese año
+  n_docs_acumulado: true      # Suma acumulada hasta ese año
+  pct_total_anual: true       # % sobre todos los documentos del país ese año
+  n_autores_distintos: true   # Autores únicos con al menos un documento
+
+  # Métricas de red (requieren networkx; ver bloque 'red')
+  largest_component_size_pct: true  # % de autores en el componente mayor
+  newcomers_pct: true               # % de autores que aparecen por primera vez
+
+  # Distribución por tipo de documento
+  pct_article: true
+  pct_book: true
+  pct_book_chapter: true
+  pct_preprint: true
+
+  # Presencia en allow lists (acceso abierto)
+  pct_doaj: true
+  pct_core: true
+  pct_high_oa_rate: true
+  pct_scielo: true
+  pct_ojs: true
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# RED DE COAUTORÍAS
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# Cálculo LOCAL, sin conexión externa. Cada autor del CSV es un nodo; dos
+# autores quedan unidos si firman el mismo documento. El componente mayor
+# indica qué proporción del campo está conectada entre sí.
+#
+# Es la parte más lenta del script. Con habilitado: false se omiten
+# largest_component_size_pct y newcomers_pct, y sus columnas no se exportan.
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+red:
+  habilitado: true
+
+  algoritmo: "connected_components"  # NO IMPLEMENTADO: el script usa siempre
+                                     # componentes conectados, según la métrica
+                                     # de Bettencourt & Kaur (2011)
+
+  # Los documentos sin author_ids no pueden entrar en el grafo.
+  #   true  → se omiten de la red pero siguen contando en las demás métricas
+  #   false → se omiten de la red y se deja constancia en el log (nivel DEBUG)
+  incluir_sin_id: true
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# PRECISIÓN NUMÉRICA
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+precision:
+  decimales_porcentaje: 1   # pct_* y pct_total_anual
+  decimales_componentes: 1  # largest_component_size_pct y newcomers_pct
+  redondeo: "round"         # round | floor | ceil
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# LOGGING
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+logging:
+  # Nivel de la salida por CONSOLA: DEBUG | INFO | WARNING | ERROR
+  # El archivo de log siempre registra en DEBUG.
+  nivel: "INFO"
+
+  # false → no se escribe archivo de log, solo consola
+  archivo_log: true
+
+  # El log se escribe en salida.directorio, junto a los resultados.
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# VALIDACIÓN
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+validacion:
+  # Avisar por log cuando una combinación palabra clave × país no tiene
+  # registros. Con false se omiten en silencio; el conteo final igual los
+  # reporta.
+  reportar_vacios: true
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# REFERENCIAS
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# Métricas bibliométricas:
+#   - Bettencourt & Kaur (2011): Evolution and structure of sustainability science
+#   - Milia (2026): Rewiring vs Reconfiguration in mainstream social science
+#
+# Estándar de documentación:
+#   - Rule et al. (2019): Ten simple rules for writing and sharing computational
+#     analyses in Jupyter Notebooks. https://doi.org/10.1371/journal.pcbi.1007007
+#
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# FIN DE CONFIGURACIÓN
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

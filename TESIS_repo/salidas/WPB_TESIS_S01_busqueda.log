@@ -1,0 +1,400 @@
+2026-08-29 19:06:49,885 [INFO] ======================================================================
+2026-08-29 19:06:49,885 [INFO] WPB_TESIS_S01_busqueda v0.1 -- inicio de corrida
+2026-08-29 19:06:49,885 [INFO] Config: WPB_TESIS_S01_busqueda.yaml
+2026-08-29 19:06:49,885 [INFO] Identificador de corrida: 2026-08-29T19:06:49
+2026-08-29 19:06:49,885 [INFO] Diccionario: diccionarios/palabras_clave_tesis.csv (separador detectado: ',')
+2026-08-29 19:06:49,885 [INFO] Diccionario: 7 filas totales, 6 activas, 1 omitidas (seleccionado != 1)
+2026-08-29 19:06:49,885 [INFO] Campos de busqueda activos (4): titres.*, resumes.*, sujetsLibelle, sujetsRameauLibelle
+2026-08-29 19:06:49,885 [INFO] Filtros globales aplicados: status=soutenue
+2026-08-29 19:06:49,885 [INFO] Consulta 1: keyword='decolonial' (13 terminos, tipo=exact)
+2026-08-29 19:06:50,161 [ERROR] HTTP 400. URL: https://theses.fr/api/v1/theses/recherche/?q=%28titres.%2A%3A%28%22decolonial%22%20OR%20%22decolonialidad%22%20OR%20%22descolonial%22%20OR%20%22de%5C-colonial%22%20OR%20%22decolonialite%22%20OR%20%22d%C3%A9coloniale%22%20OR%20%22d%C3%A9coloniaux%22%20OR%20%22d%C3%A9coloniales%22%20OR%20%22Dekolonialit%C3%A4t%22%20OR%20%22dekolonial%22%20OR%20%22decolonization%22%20OR%20%22d%C3%A9colonisation%22%20OR%20%22decoloniality%22%29%20OR%20resumes.%2A%3A%28%22decolonial%22%20OR%20%22decolonialidad%22%20OR%20%22descolonial%22%20OR%20%22de%5C-colonial%22%20OR%20%22decolonialite%22%20OR%20%22d%C3%A9coloniale%22%20OR%20%22d%C3%A9coloniaux%22%20OR%20%22d%C3%A9coloniales%22%20OR%20%22Dekolonialit%C3%A4t%22%20OR%20%22dekolonial%22%20OR%20%22decolonization%22%20OR%20%22d%C3%A9colonisation%22%20OR%20%22decoloniality%22%29%20OR%20sujetsLibelle%3A%28%22decolonial%22%20OR%20%22decolonialidad%22%20OR%20%22descolonial%22%20OR%20%22de%5C-colonial%22%20OR%20%22decolonialite%22%20OR%20%22d%C3%A9coloniale%22%20OR%20%22d%C3%A9coloniaux%22%20OR%20%22d%C3%A9coloniales%22%20OR%20%22Dekolonialit%C3%A4t%22%20OR%20%22dekolonial%22%20OR%20%22decolonization%22%20OR%20%22d%C3%A9colonisation%22%20OR%20%22decoloniality%22%29%20OR%20sujetsRameauLibelle%3A%28%22decolonial%22%20OR%20%22decolonialidad%22%20OR%20%22descolonial%22%20OR%20%22de%5C-colonial%22%20OR%20%22decolonialite%22%20OR%20%22d%C3%A9coloniale%22%20OR%20%22d%C3%A9coloniaux%22%20OR%20%22d%C3%A9coloniales%22%20OR%20%22Dekolonialit%C3%A4t%22%20OR%20%22dekolonial%22%20OR%20%22decolonization%22%20OR%20%22d%C3%A9colonisation%22%20OR%20%22decoloniality%22%29%29%20AND%20status%3A%28soutenue%29&debut=0&nombre=100
+2026-08-29 19:06:50,162 [ERROR] Un 400 suele indicar sintaxis invalida en q, o una consulta demasiado larga. Ver la seccion 5.3 de WPB_TESIS_limites_campos.md.
+2026-08-29 19:06:50,162 [ERROR] Consulta fallida, se omite: (titres.*:("decolonial" OR "decolonialidad" OR "descolonial" OR "de\-colonial" OR "decolonialite" OR "décoloniale" OR "décoloniaux" OR "décoloniales" OR "Dekolonialität" OR "dekolonial" OR "decolonization" OR "décolonisation" OR "decoloniality") OR resumes.*:("decolonial" OR "decolonialidad" OR "descolonial" OR "de\-colonial" OR "decolonialite" OR "décoloniale" OR "décoloniaux" OR "décoloniales" OR "Dekolonialität" OR "dekolonial" OR "decolonization" OR "décolonisation" OR "decoloniality") OR sujetsLibelle:("decolonial" OR "decolonialidad" OR "descolonial" OR "de\-colonial" OR "decolonialite" OR "décoloniale" OR "décoloniaux" OR "décoloniales" OR "Dekolonialität" OR "dekolonial" OR "decolonization" OR "décolonisation" OR "decoloniality") OR sujetsRameauLibelle:("decolonial" OR "decolonialidad" OR "descolonial" OR "de\-colonial" OR "decolonialite" OR "décoloniale" OR "décoloniaux" OR "décoloniales" OR "Dekolonialität" OR "dekolonial" OR "decolonization" OR "décolonisation" OR "decoloniality")) AND status:(soutenue)
+2026-08-29 19:06:50,163 [INFO]   recuperados 0, nuevos tras deduplicar 0
+2026-08-29 19:06:51,164 [INFO] Consulta 2: keyword='conviviality' (7 terminos, tipo=exact)
+2026-08-29 19:06:51,380 [ERROR] HTTP 400. URL: https://theses.fr/api/v1/theses/recherche/?q=%28titres.%2A%3A%28%22conviviality%22%20OR%20%22convivialidad%22%20OR%20%22convivencialidad%22%20OR%20%22convivialism%22%20OR%20%22convivialite%22%20OR%20%22conviviale%22%20OR%20%22convivialisme%22%29%20OR%20resumes.%2A%3A%28%22conviviality%22%20OR%20%22convivialidad%22%20OR%20%22convivencialidad%22%20OR%20%22convivialism%22%20OR%20%22convivialite%22%20OR%20%22conviviale%22%20OR%20%22convivialisme%22%29%20OR%20sujetsLibelle%3A%28%22conviviality%22%20OR%20%22convivialidad%22%20OR%20%22convivencialidad%22%20OR%20%22convivialism%22%20OR%20%22convivialite%22%20OR%20%22conviviale%22%20OR%20%22convivialisme%22%29%20OR%20sujetsRameauLibelle%3A%28%22conviviality%22%20OR%20%22convivialidad%22%20OR%20%22convivencialidad%22%20OR%20%22convivialism%22%20OR%20%22convivialite%22%20OR%20%22conviviale%22%20OR%20%22convivialisme%22%29%29%20AND%20status%3A%28soutenue%29&debut=0&nombre=100
+2026-08-29 19:06:51,381 [ERROR] Un 400 suele indicar sintaxis invalida en q, o una consulta demasiado larga. Ver la seccion 5.3 de WPB_TESIS_limites_campos.md.
+2026-08-29 19:06:51,382 [ERROR] Consulta fallida, se omite: (titres.*:("conviviality" OR "convivialidad" OR "convivencialidad" OR "convivialism" OR "convivialite" OR "conviviale" OR "convivialisme") OR resumes.*:("conviviality" OR "convivialidad" OR "convivencialidad" OR "convivialism" OR "convivialite" OR "conviviale" OR "convivialisme") OR sujetsLibelle:("conviviality" OR "convivialidad" OR "convivencialidad" OR "convivialism" OR "convivialite" OR "conviviale" OR "convivialisme") OR sujetsRameauLibelle:("conviviality" OR "convivialidad" OR "convivencialidad" OR "convivialism" OR "convivialite" OR "conviviale" OR "convivialisme")) AND status:(soutenue)
+2026-08-29 19:06:51,383 [INFO]   recuperados 0, nuevos tras deduplicar 0
+2026-08-29 19:06:52,384 [INFO] Consulta 3: keyword='teoria de la dependencia' (7 terminos, tipo=exact)
+2026-08-29 19:06:52,593 [ERROR] HTTP 400. URL: https://theses.fr/api/v1/theses/recherche/?q=%28titres.%2A%3A%28%22teoria%20de%20la%20dependencia%22%20OR%20%22dependency%20theory%22%20OR%20%22Dependenztheorie%22%20OR%20%22th%C3%A9orie%20de%20la%20d%C3%A9pendance%22%20OR%20%22teoria%20dependencia%22%20OR%20%22teoria%20da%20depend%C3%AAncia%22%20OR%20%22dependentista%22%29%20OR%20resumes.%2A%3A%28%22teoria%20de%20la%20dependencia%22%20OR%20%22dependency%20theory%22%20OR%20%22Dependenztheorie%22%20OR%20%22th%C3%A9orie%20de%20la%20d%C3%A9pendance%22%20OR%20%22teoria%20dependencia%22%20OR%20%22teoria%20da%20depend%C3%AAncia%22%20OR%20%22dependentista%22%29%20OR%20sujetsLibelle%3A%28%22teoria%20de%20la%20dependencia%22%20OR%20%22dependency%20theory%22%20OR%20%22Dependenztheorie%22%20OR%20%22th%C3%A9orie%20de%20la%20d%C3%A9pendance%22%20OR%20%22teoria%20dependencia%22%20OR%20%22teoria%20da%20depend%C3%AAncia%22%20OR%20%22dependentista%22%29%20OR%20sujetsRameauLibelle%3A%28%22teoria%20de%20la%20dependencia%22%20OR%20%22dependency%20theory%22%20OR%20%22Dependenztheorie%22%20OR%20%22th%C3%A9orie%20de%20la%20d%C3%A9pendance%22%20OR%20%22teoria%20dependencia%22%20OR%20%22teoria%20da%20depend%C3%AAncia%22%20OR%20%22dependentista%22%29%29%20AND%20status%3A%28soutenue%29&debut=0&nombre=100
+2026-08-29 19:06:52,594 [ERROR] Un 400 suele indicar sintaxis invalida en q, o una consulta demasiado larga. Ver la seccion 5.3 de WPB_TESIS_limites_campos.md.
+2026-08-29 19:06:52,596 [ERROR] Consulta fallida, se omite: (titres.*:("teoria de la dependencia" OR "dependency theory" OR "Dependenztheorie" OR "théorie de la dépendance" OR "teoria dependencia" OR "teoria da dependência" OR "dependentista") OR resumes.*:("teoria de la dependencia" OR "dependency theory" OR "Dependenztheorie" OR "théorie de la dépendance" OR "teoria dependencia" OR "teoria da dependência" OR "dependentista") OR sujetsLibelle:("teoria de la dependencia" OR "dependency theory" OR "Dependenztheorie" OR "théorie de la dépendance" OR "teoria dependencia" OR "teoria da dependência" OR "dependentista") OR sujetsRameauLibelle:("teoria de la dependencia" OR "dependency theory" OR "Dependenztheorie" OR "théorie de la dépendance" OR "teoria dependencia" OR "teoria da dependência" OR "dependentista")) AND status:(soutenue)
+2026-08-29 19:06:52,596 [INFO]   recuperados 0, nuevos tras deduplicar 0
+2026-08-29 19:06:53,601 [INFO] Consulta 4: keyword='buen vivir' (8 terminos, tipo=exact)
+2026-08-29 19:06:53,803 [ERROR] HTTP 400. URL: https://theses.fr/api/v1/theses/recherche/?q=%28titres.%2A%3A%28%22buen%20vivir%22%20OR%20%22sumak%20kawsay%22%20OR%20%22suma%20qama%C3%B1a%22%20OR%20%22sumaq%20kausay%22%20OR%20%22buen%20vivir%20andino%22%20OR%20%22bien%20vivre%22%20OR%20%22gutes%20Leben%22%20OR%20%22vivir%20bien%22%29%20OR%20resumes.%2A%3A%28%22buen%20vivir%22%20OR%20%22sumak%20kawsay%22%20OR%20%22suma%20qama%C3%B1a%22%20OR%20%22sumaq%20kausay%22%20OR%20%22buen%20vivir%20andino%22%20OR%20%22bien%20vivre%22%20OR%20%22gutes%20Leben%22%20OR%20%22vivir%20bien%22%29%20OR%20sujetsLibelle%3A%28%22buen%20vivir%22%20OR%20%22sumak%20kawsay%22%20OR%20%22suma%20qama%C3%B1a%22%20OR%20%22sumaq%20kausay%22%20OR%20%22buen%20vivir%20andino%22%20OR%20%22bien%20vivre%22%20OR%20%22gutes%20Leben%22%20OR%20%22vivir%20bien%22%29%20OR%20sujetsRameauLibelle%3A%28%22buen%20vivir%22%20OR%20%22sumak%20kawsay%22%20OR%20%22suma%20qama%C3%B1a%22%20OR%20%22sumaq%20kausay%22%20OR%20%22buen%20vivir%20andino%22%20OR%20%22bien%20vivre%22%20OR%20%22gutes%20Leben%22%20OR%20%22vivir%20bien%22%29%29%20AND%20status%3A%28soutenue%29&debut=0&nombre=100
+2026-08-29 19:06:53,804 [ERROR] Un 400 suele indicar sintaxis invalida en q, o una consulta demasiado larga. Ver la seccion 5.3 de WPB_TESIS_limites_campos.md.
+2026-08-29 19:06:53,805 [ERROR] Consulta fallida, se omite: (titres.*:("buen vivir" OR "sumak kawsay" OR "suma qamaña" OR "sumaq kausay" OR "buen vivir andino" OR "bien vivre" OR "gutes Leben" OR "vivir bien") OR resumes.*:("buen vivir" OR "sumak kawsay" OR "suma qamaña" OR "sumaq kausay" OR "buen vivir andino" OR "bien vivre" OR "gutes Leben" OR "vivir bien") OR sujetsLibelle:("buen vivir" OR "sumak kawsay" OR "suma qamaña" OR "sumaq kausay" OR "buen vivir andino" OR "bien vivre" OR "gutes Leben" OR "vivir bien") OR sujetsRameauLibelle:("buen vivir" OR "sumak kawsay" OR "suma qamaña" OR "sumaq kausay" OR "buen vivir andino" OR "bien vivre" OR "gutes Leben" OR "vivir bien")) AND status:(soutenue)
+2026-08-29 19:06:53,805 [INFO]   recuperados 0, nuevos tras deduplicar 0
+2026-08-29 19:06:54,810 [INFO] Consulta 5: keyword='pluriverso' (9 terminos, tipo=exact)
+2026-08-29 19:06:55,037 [ERROR] HTTP 400. URL: https://theses.fr/api/v1/theses/recherche/?q=%28titres.%2A%3A%28%22pluriverso%22%20OR%20%22pluriversalidad%22%20OR%20%22pluriversal%22%20OR%20%22pluriversalism%22%20OR%20%22pluriversalisme%22%20OR%20%22Pluriversum%22%20OR%20%22pluriverse%22%20OR%20%22pluriversale%22%20OR%20%22pluriversalen%22%29%20OR%20resumes.%2A%3A%28%22pluriverso%22%20OR%20%22pluriversalidad%22%20OR%20%22pluriversal%22%20OR%20%22pluriversalism%22%20OR%20%22pluriversalisme%22%20OR%20%22Pluriversum%22%20OR%20%22pluriverse%22%20OR%20%22pluriversale%22%20OR%20%22pluriversalen%22%29%20OR%20sujetsLibelle%3A%28%22pluriverso%22%20OR%20%22pluriversalidad%22%20OR%20%22pluriversal%22%20OR%20%22pluriversalism%22%20OR%20%22pluriversalisme%22%20OR%20%22Pluriversum%22%20OR%20%22pluriverse%22%20OR%20%22pluriversale%22%20OR%20%22pluriversalen%22%29%20OR%20sujetsRameauLibelle%3A%28%22pluriverso%22%20OR%20%22pluriversalidad%22%20OR%20%22pluriversal%22%20OR%20%22pluriversalism%22%20OR%20%22pluriversalisme%22%20OR%20%22Pluriversum%22%20OR%20%22pluriverse%22%20OR%20%22pluriversale%22%20OR%20%22pluriversalen%22%29%29%20AND%20status%3A%28soutenue%29&debut=0&nombre=100
+2026-08-29 19:06:55,038 [ERROR] Un 400 suele indicar sintaxis invalida en q, o una consulta demasiado larga. Ver la seccion 5.3 de WPB_TESIS_limites_campos.md.
+2026-08-29 19:06:55,041 [ERROR] Consulta fallida, se omite: (titres.*:("pluriverso" OR "pluriversalidad" OR "pluriversal" OR "pluriversalism" OR "pluriversalisme" OR "Pluriversum" OR "pluriverse" OR "pluriversale" OR "pluriversalen") OR resumes.*:("pluriverso" OR "pluriversalidad" OR "pluriversal" OR "pluriversalism" OR "pluriversalisme" OR "Pluriversum" OR "pluriverse" OR "pluriversale" OR "pluriversalen") OR sujetsLibelle:("pluriverso" OR "pluriversalidad" OR "pluriversal" OR "pluriversalism" OR "pluriversalisme" OR "Pluriversum" OR "pluriverse" OR "pluriversale" OR "pluriversalen") OR sujetsRameauLibelle:("pluriverso" OR "pluriversalidad" OR "pluriversal" OR "pluriversalism" OR "pluriversalisme" OR "Pluriversum" OR "pluriverse" OR "pluriversale" OR "pluriversalen")) AND status:(soutenue)
+2026-08-29 19:06:55,041 [INFO]   recuperados 0, nuevos tras deduplicar 0
+2026-08-29 19:06:56,046 [INFO] Consulta 6: keyword='quilombo' (8 terminos, tipo=exact)
+2026-08-29 19:06:56,247 [ERROR] HTTP 400. URL: https://theses.fr/api/v1/theses/recherche/?q=%28titres.%2A%3A%28%22quilombo%22%20OR%20%22quilombola%22%20OR%20%22quilombolas%22%20OR%20%22territ%C3%B3rio%20quilombola%22%20OR%20%22quilombos%22%20OR%20%22terre%20quilombola%22%20OR%20%22communaut%C3%A9%20quilombola%22%20OR%20%22Quilombo%5C-Territorium%22%29%20OR%20resumes.%2A%3A%28%22quilombo%22%20OR%20%22quilombola%22%20OR%20%22quilombolas%22%20OR%20%22territ%C3%B3rio%20quilombola%22%20OR%20%22quilombos%22%20OR%20%22terre%20quilombola%22%20OR%20%22communaut%C3%A9%20quilombola%22%20OR%20%22Quilombo%5C-Territorium%22%29%20OR%20sujetsLibelle%3A%28%22quilombo%22%20OR%20%22quilombola%22%20OR%20%22quilombolas%22%20OR%20%22territ%C3%B3rio%20quilombola%22%20OR%20%22quilombos%22%20OR%20%22terre%20quilombola%22%20OR%20%22communaut%C3%A9%20quilombola%22%20OR%20%22Quilombo%5C-Territorium%22%29%20OR%20sujetsRameauLibelle%3A%28%22quilombo%22%20OR%20%22quilombola%22%20OR%20%22quilombolas%22%20OR%20%22territ%C3%B3rio%20quilombola%22%20OR%20%22quilombos%22%20OR%20%22terre%20quilombola%22%20OR%20%22communaut%C3%A9%20quilombola%22%20OR%20%22Quilombo%5C-Territorium%22%29%29%20AND%20status%3A%28soutenue%29&debut=0&nombre=100
+2026-08-29 19:06:56,248 [ERROR] Un 400 suele indicar sintaxis invalida en q, o una consulta demasiado larga. Ver la seccion 5.3 de WPB_TESIS_limites_campos.md.
+2026-08-29 19:06:56,251 [ERROR] Consulta fallida, se omite: (titres.*:("quilombo" OR "quilombola" OR "quilombolas" OR "território quilombola" OR "quilombos" OR "terre quilombola" OR "communauté quilombola" OR "Quilombo\-Territorium") OR resumes.*:("quilombo" OR "quilombola" OR "quilombolas" OR "território quilombola" OR "quilombos" OR "terre quilombola" OR "communauté quilombola" OR "Quilombo\-Territorium") OR sujetsLibelle:("quilombo" OR "quilombola" OR "quilombolas" OR "território quilombola" OR "quilombos" OR "terre quilombola" OR "communauté quilombola" OR "Quilombo\-Territorium") OR sujetsRameauLibelle:("quilombo" OR "quilombola" OR "quilombolas" OR "território quilombola" OR "quilombos" OR "terre quilombola" OR "communauté quilombola" OR "Quilombo\-Territorium")) AND status:(soutenue)
+2026-08-29 19:06:56,251 [INFO]   recuperados 0, nuevos tras deduplicar 0
+2026-08-29 19:06:57,252 [ERROR] Ninguna consulta devolvio resultados. No se genera salida.
+2026-08-29 19:06:57,253 [ERROR] Revisar: terminos del diccionario, campos activos y filtros globales.
+2026-08-29 21:36:24,775 [INFO] ======================================================================
+2026-08-29 21:36:24,776 [INFO] WPB_TESIS_S01_busqueda v0.2 -- inicio de corrida
+2026-08-29 21:36:24,776 [INFO] Config: WPB_TESIS_S01_busqueda.yaml
+2026-08-29 21:36:24,776 [INFO] Identificador de corrida: 2026-08-29T21:36:24
+2026-08-29 21:36:24,776 [INFO] Diccionario: diccionarios/palabras_clave_tesis.csv (separador detectado: ',')
+2026-08-29 21:36:24,776 [INFO] Diccionario: 7 filas totales, 6 activas, 1 omitidas (seleccionado != 1)
+2026-08-29 21:36:24,776 [INFO] Campos de busqueda activos (4): titres.\*, resumes.\*, sujetsLibelle, sujetsRameauLibelle
+2026-08-29 21:36:24,776 [INFO] Filtros globales aplicados: status=soutenue
+2026-08-29 21:36:24,776 [INFO] Consulta 1: keyword='decolonial' (13 terminos, tipo=exact)
+2026-08-29 21:36:26,127 [INFO]   totalHits = 3849
+2026-08-29 21:37:44,550 [INFO]   recuperados 3849, nuevos tras deduplicar 3849
+2026-08-29 21:37:45,556 [INFO] Consulta 2: keyword='conviviality' (7 terminos, tipo=exact)
+2026-08-29 21:37:46,350 [INFO]   totalHits = 494
+2026-08-29 21:37:53,178 [INFO]   recuperados 494, nuevos tras deduplicar 484
+2026-08-29 21:37:54,181 [INFO] Consulta 3: keyword='teoria de la dependencia' (7 terminos, tipo=exact)
+2026-08-29 21:37:55,108 [INFO]   totalHits = 51
+2026-08-29 21:37:55,110 [INFO]   recuperados 51, nuevos tras deduplicar 49
+2026-08-29 21:37:56,115 [INFO] Consulta 4: keyword='buen vivir' (8 terminos, tipo=exact)
+2026-08-29 21:37:57,100 [INFO]   totalHits = 54
+2026-08-29 21:37:57,101 [INFO]   recuperados 54, nuevos tras deduplicar 51
+2026-08-29 21:37:58,105 [INFO] Consulta 5: keyword='pluriverso' (9 terminos, tipo=exact)
+2026-08-29 21:37:58,952 [INFO]   totalHits = 7
+2026-08-29 21:37:58,952 [INFO]   recuperados 7, nuevos tras deduplicar 3
+2026-08-29 21:37:59,958 [INFO] Consulta 6: keyword='quilombo' (8 terminos, tipo=exact)
+2026-08-29 21:38:00,751 [INFO]   totalHits = 7
+2026-08-29 21:38:00,752 [INFO]   recuperados 7, nuevos tras deduplicar 5
+2026-08-29 21:38:01,757 [INFO] Candidatos unicos tras deduplicar: 4441
+2026-08-29 21:38:01,758 [INFO] recuperacion.resumenes = true: 4441 llamadas adicionales, una por candidato (~74.0 min a 1.0s de pausa).
+2026-08-29 21:38:31,443 [INFO]   resumenes recuperados: 25/4441
+2026-08-29 21:39:02,036 [INFO]   resumenes recuperados: 50/4441
+2026-08-29 21:39:32,613 [INFO]   resumenes recuperados: 75/4441
+2026-08-29 21:40:02,819 [INFO]   resumenes recuperados: 100/4441
+2026-08-29 21:40:33,422 [INFO]   resumenes recuperados: 125/4441
+2026-08-29 21:41:04,265 [INFO]   resumenes recuperados: 150/4441
+2026-08-29 21:41:34,887 [INFO]   resumenes recuperados: 175/4441
+2026-08-29 21:42:05,206 [INFO]   resumenes recuperados: 200/4441
+2026-08-29 21:42:35,867 [INFO]   resumenes recuperados: 225/4441
+2026-08-29 21:43:06,483 [INFO]   resumenes recuperados: 250/4441
+2026-08-29 21:43:37,525 [INFO]   resumenes recuperados: 275/4441
+2026-08-29 21:44:08,131 [INFO]   resumenes recuperados: 300/4441
+2026-08-29 21:44:38,954 [INFO]   resumenes recuperados: 325/4441
+2026-08-29 21:45:09,620 [INFO]   resumenes recuperados: 350/4441
+2026-08-29 21:45:41,226 [INFO]   resumenes recuperados: 375/4441
+2026-08-29 21:46:13,452 [INFO]   resumenes recuperados: 400/4441
+2026-08-29 21:46:44,197 [INFO]   resumenes recuperados: 425/4441
+2026-08-29 21:47:14,910 [INFO]   resumenes recuperados: 450/4441
+2026-08-29 21:47:45,325 [INFO]   resumenes recuperados: 475/4441
+2026-08-29 21:48:15,884 [INFO]   resumenes recuperados: 500/4441
+2026-08-29 21:48:47,481 [INFO]   resumenes recuperados: 525/4441
+2026-08-29 21:49:18,142 [INFO]   resumenes recuperados: 550/4441
+2026-08-29 21:49:49,011 [INFO]   resumenes recuperados: 575/4441
+2026-08-29 21:50:19,358 [INFO]   resumenes recuperados: 600/4441
+2026-08-29 21:50:50,011 [INFO]   resumenes recuperados: 625/4441
+2026-08-29 21:51:20,395 [INFO]   resumenes recuperados: 650/4441
+2026-08-29 21:51:50,593 [INFO]   resumenes recuperados: 675/4441
+2026-08-29 21:52:21,163 [INFO]   resumenes recuperados: 700/4441
+2026-08-29 21:52:51,282 [INFO]   resumenes recuperados: 725/4441
+2026-08-29 21:53:21,663 [INFO]   resumenes recuperados: 750/4441
+2026-08-29 21:53:51,825 [INFO]   resumenes recuperados: 775/4441
+2026-08-29 21:54:22,211 [INFO]   resumenes recuperados: 800/4441
+2026-08-29 21:54:52,450 [INFO]   resumenes recuperados: 825/4441
+2026-08-29 21:55:22,648 [INFO]   resumenes recuperados: 850/4441
+2026-08-29 21:55:53,654 [INFO]   resumenes recuperados: 875/4441
+2026-08-29 21:56:24,364 [INFO]   resumenes recuperados: 900/4441
+2026-08-29 21:56:54,489 [INFO]   resumenes recuperados: 925/4441
+2026-08-29 21:57:24,792 [INFO]   resumenes recuperados: 950/4441
+2026-08-29 21:57:55,136 [INFO]   resumenes recuperados: 975/4441
+2026-08-29 21:58:25,674 [INFO]   resumenes recuperados: 1000/4441
+2026-08-29 21:58:55,898 [INFO]   resumenes recuperados: 1025/4441
+2026-08-29 21:59:25,878 [INFO]   resumenes recuperados: 1050/4441
+2026-08-29 21:59:56,276 [INFO]   resumenes recuperados: 1075/4441
+2026-08-29 22:00:27,039 [INFO]   resumenes recuperados: 1100/4441
+2026-08-29 22:00:57,242 [INFO]   resumenes recuperados: 1125/4441
+2026-08-29 22:01:27,469 [INFO]   resumenes recuperados: 1150/4441
+2026-08-29 22:01:57,946 [INFO]   resumenes recuperados: 1175/4441
+2026-08-29 22:02:28,124 [INFO]   resumenes recuperados: 1200/4441
+2026-08-29 22:02:58,543 [INFO]   resumenes recuperados: 1225/4441
+2026-08-29 22:03:29,100 [INFO]   resumenes recuperados: 1250/4441
+2026-08-29 22:03:59,421 [INFO]   resumenes recuperados: 1275/4441
+2026-08-29 22:04:29,518 [INFO]   resumenes recuperados: 1300/4441
+2026-08-29 22:04:59,728 [INFO]   resumenes recuperados: 1325/4441
+2026-08-29 22:05:29,912 [INFO]   resumenes recuperados: 1350/4441
+2026-08-29 22:06:00,770 [INFO]   resumenes recuperados: 1375/4441
+2026-08-29 22:06:31,177 [INFO]   resumenes recuperados: 1400/4441
+2026-08-29 22:07:01,636 [INFO]   resumenes recuperados: 1425/4441
+2026-08-29 22:07:31,955 [INFO]   resumenes recuperados: 1450/4441
+2026-08-29 22:08:02,927 [INFO]   resumenes recuperados: 1475/4441
+2026-08-29 22:08:33,125 [INFO]   resumenes recuperados: 1500/4441
+2026-08-29 22:09:03,437 [INFO]   resumenes recuperados: 1525/4441
+2026-08-29 22:09:35,180 [INFO]   resumenes recuperados: 1550/4441
+2026-08-29 22:10:05,535 [INFO]   resumenes recuperados: 1575/4441
+2026-08-29 22:10:36,161 [INFO]   resumenes recuperados: 1600/4441
+2026-08-29 22:11:07,135 [INFO]   resumenes recuperados: 1625/4441
+2026-08-29 22:11:37,569 [INFO]   resumenes recuperados: 1650/4441
+2026-08-29 22:12:08,407 [INFO]   resumenes recuperados: 1675/4441
+2026-08-29 22:12:38,738 [INFO]   resumenes recuperados: 1700/4441
+2026-08-29 22:13:09,012 [INFO]   resumenes recuperados: 1725/4441
+2026-08-29 22:13:40,683 [INFO]   resumenes recuperados: 1750/4441
+2026-08-29 22:14:11,499 [INFO]   resumenes recuperados: 1775/4441
+2026-08-29 22:14:42,823 [INFO]   resumenes recuperados: 1800/4441
+2026-08-29 22:15:13,677 [INFO]   resumenes recuperados: 1825/4441
+2026-08-29 22:15:44,768 [INFO]   resumenes recuperados: 1850/4441
+2026-08-29 22:16:15,128 [INFO]   resumenes recuperados: 1875/4441
+2026-08-29 22:16:45,409 [INFO]   resumenes recuperados: 1900/4441
+2026-08-29 22:17:15,499 [INFO]   resumenes recuperados: 1925/4441
+2026-08-29 22:17:46,106 [INFO]   resumenes recuperados: 1950/4441
+2026-08-29 22:18:18,085 [INFO]   resumenes recuperados: 1975/4441
+2026-08-29 22:18:49,266 [INFO]   resumenes recuperados: 2000/4441
+2026-08-29 22:19:19,511 [INFO]   resumenes recuperados: 2025/4441
+2026-08-29 22:19:49,630 [INFO]   resumenes recuperados: 2050/4441
+2026-08-29 22:20:20,199 [INFO]   resumenes recuperados: 2075/4441
+2026-08-29 22:20:50,417 [INFO]   resumenes recuperados: 2100/4441
+2026-08-29 22:21:20,651 [INFO]   resumenes recuperados: 2125/4441
+2026-08-29 22:21:51,278 [INFO]   resumenes recuperados: 2150/4441
+2026-08-29 22:22:21,765 [INFO]   resumenes recuperados: 2175/4441
+2026-08-29 22:22:52,185 [INFO]   resumenes recuperados: 2200/4441
+2026-08-29 22:23:24,579 [INFO]   resumenes recuperados: 2225/4441
+2026-08-29 22:23:56,097 [INFO]   resumenes recuperados: 2250/4441
+2026-08-29 22:24:26,080 [INFO]   resumenes recuperados: 2275/4441
+2026-08-29 22:24:56,263 [INFO]   resumenes recuperados: 2300/4441
+2026-08-29 22:25:26,572 [INFO]   resumenes recuperados: 2325/4441
+2026-08-29 22:25:56,963 [INFO]   resumenes recuperados: 2350/4441
+2026-08-29 22:26:27,293 [INFO]   resumenes recuperados: 2375/4441
+2026-08-29 22:26:58,330 [INFO]   resumenes recuperados: 2400/4441
+2026-08-29 22:27:30,903 [INFO]   resumenes recuperados: 2425/4441
+2026-08-29 22:35:19,636 [INFO] ======================================================================
+2026-08-29 22:35:19,637 [INFO] WPB_TESIS_S01_busqueda v0.5 -- inicio de corrida
+2026-08-29 22:35:19,637 [INFO] Config: WPB_TESIS_S01_busqueda.yaml
+2026-08-29 22:35:19,637 [INFO] Identificador de corrida: 2026-08-29T22:35:19
+2026-08-29 22:35:19,637 [INFO] Diccionario: diccionarios/palabras_clave_tesis.csv (separador detectado: ',')
+2026-08-29 22:35:19,637 [INFO] Diccionario: 7 filas totales, 6 activas, 1 omitidas (seleccionado != 1)
+2026-08-29 22:35:19,637 [INFO] Campos de busqueda activos (4): titres.\*, resumes.\*, sujetsLibelle, sujetsRameauLibelle
+2026-08-29 22:35:19,638 [INFO] Filtros globales aplicados: status=soutenue
+2026-08-29 22:35:19,638 [INFO] ------------------------------------------------------------
+2026-08-29 22:35:19,638 [INFO] SONDEO PREVIO: se miden los totales sin descargar registros.
+2026-08-29 22:38:29,912 [INFO] ======================================================================
+2026-08-29 22:38:29,912 [INFO] WPB_TESIS_S01_busqueda v0.6 -- inicio de corrida
+2026-08-29 22:38:29,912 [INFO] Config: WPB_TESIS_S01_busqueda.yaml
+2026-08-29 22:38:29,912 [INFO] Identificador de corrida: 2026-08-29T22:38:29
+2026-08-29 22:38:29,913 [INFO] Diccionario: diccionarios/palabras_clave_tesis.csv (separador detectado: ',')
+2026-08-29 22:38:29,913 [INFO] Diccionario: 7 filas totales, 6 activas, 1 omitidas (seleccionado != 1)
+2026-08-29 22:38:29,913 [INFO] Campos de busqueda activos (4): titres.\*, resumes.\*, sujetsLibelle, sujetsRameauLibelle
+2026-08-29 22:38:29,913 [INFO] Filtros globales aplicados: status=soutenue
+2026-08-29 22:38:29,913 [INFO] ------------------------------------------------------------
+2026-08-29 22:38:29,913 [INFO] SONDEO PREVIO: se miden los totales sin descargar registros.
+2026-08-29 22:38:29,913 [INFO]   6 filas, 52 terminos, 4 campos (con desglose por campo)
+2026-08-29 22:38:29,913 [INFO]   266 consultas, ~6 minutos a 1.0s de pausa.
+2026-08-29 22:38:29,913 [INFO]   sondeo.por_campo = false reduciria a 58 consultas, pero no diria de que campo viene el volumen.
+2026-08-29 22:38:30,648 [INFO]   [1/266] fila 'decolonial': 3,849 resultados, 13 terminos por medir
+2026-08-29 22:38:37,747 [INFO]   [6/266]   decolonial                   116
+2026-08-29 22:38:43,825 [INFO]   [11/266]   decolonialidad               1
+2026-08-29 22:38:50,940 [INFO]   [16/266]   descolonial                  4
+2026-08-29 22:38:57,161 [INFO]   [21/266]   de-colonial                  3,399
+2026-08-29 22:39:03,449 [INFO]   [26/266]   decolonialite                32
+2026-08-29 22:39:09,691 [INFO]   [31/266]   décoloniale                  98
+2026-08-29 22:39:15,780 [INFO]   [36/266]   décoloniaux                  93
+2026-08-29 22:39:21,848 [INFO]   [41/266]   décoloniales                 97
+2026-08-29 22:39:27,961 [INFO]   [46/266]   Dekolonialität               0
+2026-08-29 22:39:34,050 [INFO]   [51/266]   dekolonial                   0
+2026-08-29 22:39:40,149 [INFO]   [56/266]   decolonization               331
+2026-08-29 22:39:46,318 [INFO]   [61/266]   décolonisation               562
+2026-08-29 22:39:52,448 [INFO]   [66/266]   decoloniality                100
+2026-08-29 22:39:52,978 [INFO]   [67/266] fila 'conviviality': 494 resultados, 7 terminos por medir
+2026-08-29 22:40:00,047 [INFO]   [72/266]   conviviality                 98
+2026-08-29 22:40:06,134 [INFO]   [77/266]   convivialidad                1
+2026-08-29 22:40:12,257 [INFO]   [82/266]   convivencialidad             0
+2026-08-29 22:40:18,360 [INFO]   [87/266]   convivialism                 94
+2026-08-29 22:40:24,452 [INFO]   [92/266]   convivialite                 176
+2026-08-29 22:40:30,561 [INFO]   [97/266]   conviviale                   317
+2026-08-29 22:40:36,665 [INFO]   [102/266]   convivialisme                6
+2026-08-29 22:40:37,319 [INFO]   [103/266] fila 'teoria de la dependencia': 51 resultados, 7 terminos por medir
+2026-08-29 22:40:44,543 [INFO]   [108/266]   teoria de la dependencia     1
+2026-08-29 22:40:50,694 [INFO]   [113/266]   dependency theory            33
+2026-08-29 22:40:56,772 [INFO]   [118/266]   Dependenztheorie             0
+2026-08-29 22:41:02,943 [INFO]   [123/266]   théorie de la dépendance     39
+2026-08-29 22:41:09,041 [INFO]   [128/266]   teoria dependencia           0
+2026-08-29 22:41:15,215 [INFO]   [133/266]   teoria da dependência        1
+2026-08-29 22:41:21,305 [INFO]   [138/266]   dependentista                0
+2026-08-29 22:41:21,965 [INFO]   [139/266] fila 'buen vivir': 54 resultados, 8 terminos por medir
+2026-08-29 22:41:29,127 [INFO]   [144/266]   buen vivir                   15
+2026-08-29 22:41:35,257 [INFO]   [149/266]   sumak kawsay                 5
+2026-08-29 22:41:41,457 [INFO]   [154/266]   suma qamaña                  1
+2026-08-29 22:41:47,626 [INFO]   [159/266]   sumaq kausay                 0
+2026-08-29 22:41:53,946 [INFO]   [164/266]   buen vivir andino            0
+2026-08-29 22:42:00,069 [INFO]   [169/266]   bien vivre                   33
+2026-08-29 22:42:06,234 [INFO]   [174/266]   gutes Leben                  2
+2026-08-29 22:42:12,376 [INFO]   [179/266]   vivir bien                   4
+2026-08-29 22:42:12,966 [INFO]   [180/266] fila 'pluriverso': 7 resultados, 9 terminos por medir
+2026-08-29 22:42:20,074 [INFO]   [185/266]   pluriverso                   1
+2026-08-29 22:42:26,224 [INFO]   [190/266]   pluriversalidad              0
+2026-08-29 22:42:32,351 [INFO]   [195/266]   pluriversal                  6
+2026-08-29 22:42:38,608 [INFO]   [200/266]   pluriversalism               5
+2026-08-29 22:42:44,785 [INFO]   [205/266]   pluriversalisme              0
+2026-08-29 22:42:50,882 [INFO]   [210/266]   Pluriversum                  0
+2026-08-29 22:42:56,984 [INFO]   [215/266]   pluriverse                   6
+2026-08-29 22:43:03,089 [INFO]   [220/266]   pluriversale                 0
+2026-08-29 22:43:10,090 [INFO]   [225/266]   pluriversalen                0
+2026-08-29 22:43:10,724 [INFO]   [226/266] fila 'quilombo': 7 resultados, 8 terminos por medir
+2026-08-29 22:43:18,002 [INFO]   [231/266]   quilombo                     5
+2026-08-29 22:43:24,263 [INFO]   [236/266]   quilombola                   5
+2026-08-29 22:43:30,413 [INFO]   [241/266]   quilombolas                  5
+2026-08-29 22:43:36,546 [INFO]   [246/266]   território quilombola        0
+2026-08-29 22:43:42,609 [INFO]   [251/266]   quilombos                    4
+2026-08-29 22:43:48,704 [INFO]   [256/266]   terre quilombola             0
+2026-08-29 22:43:54,861 [INFO]   [261/266]   communauté quilombola        1
+2026-08-29 22:44:01,033 [INFO]   [266/266]   Quilombo-Territorium         0
+2026-08-29 22:44:01,036 [WARNING] El sondeo estima hasta 4,462 candidatos, por encima de sondeo.maximo_candidatos (500). Recordar que cada candidato lo revisa una persona.
+2026-08-29 22:44:01,036 [WARNING] 17 terminos superan los umbrales de sondeo. Ver el informe de arriba.
+2026-08-30 12:30:43,697 [INFO] Cancelado tras el sondeo. No se descargo nada. Revisar el diccionario y volver a correr.
+2026-08-30 12:30:50,407 [INFO] ======================================================================
+2026-08-30 12:30:50,408 [INFO] WPB_TESIS_S01_busqueda v0.6 -- inicio de corrida
+2026-08-30 12:30:50,408 [INFO] Config: WPB_TESIS_S01_busqueda.yaml
+2026-08-30 12:30:50,408 [INFO] Identificador de corrida: 2026-08-30T12:30:50
+2026-08-30 12:30:50,408 [INFO] Diccionario: diccionarios/palabras_clave_tesis.csv (separador detectado: ',')
+2026-08-30 12:30:50,408 [INFO] Diccionario: 7 filas totales, 6 activas, 1 omitidas (seleccionado != 1)
+2026-08-30 12:30:50,408 [INFO] Campos de busqueda activos (4): titres.\*, resumes.\*, sujetsLibelle, sujetsRameauLibelle
+2026-08-30 12:30:50,408 [INFO] Filtros globales aplicados: status=soutenue
+2026-08-30 12:30:50,408 [INFO] ------------------------------------------------------------
+2026-08-30 12:30:50,408 [INFO] SONDEO PREVIO: se miden los totales sin descargar registros.
+2026-08-30 12:30:50,408 [INFO]   6 filas, 51 terminos, 4 campos (con desglose por campo)
+2026-08-30 12:30:50,408 [INFO]   261 consultas, ~6 minutos a 1.0s de pausa.
+2026-08-30 12:30:50,408 [INFO]   sondeo.por_campo = false reduciria a 57 consultas, pero no diria de que campo viene el volumen.
+2026-08-30 12:30:51,213 [INFO]   [1/261] fila 'decolonial': 694 resultados, 12 terminos por medir
+2026-08-30 12:30:58,352 [INFO]   [6/261]   decolonial                   116
+2026-08-30 12:31:04,480 [INFO]   [11/261]   decolonialidad               1
+2026-08-30 12:31:10,595 [INFO]   [16/261]   descolonial                  4
+2026-08-30 12:31:16,803 [INFO]   [21/261]   decolonialite                32
+2026-08-30 12:31:23,013 [INFO]   [26/261]   décoloniale                  98
+2026-08-30 12:31:29,213 [INFO]   [31/261]   décoloniaux                  93
+2026-08-30 12:31:35,393 [INFO]   [36/261]   décoloniales                 97
+2026-08-30 12:31:41,534 [INFO]   [41/261]   Dekolonialität               0
+2026-08-30 12:31:47,696 [INFO]   [46/261]   dekolonial                   0
+2026-08-30 12:31:53,946 [INFO]   [51/261]   decolonization               331
+2026-08-30 12:32:00,109 [INFO]   [56/261]   décolonisation               562
+2026-08-30 12:32:06,226 [INFO]   [61/261]   decoloniality                100
+2026-08-30 12:32:06,767 [INFO]   [62/261] fila 'conviviality': 494 resultados, 7 terminos por medir
+2026-08-30 12:32:14,042 [INFO]   [67/261]   conviviality                 98
+2026-08-30 12:32:20,239 [INFO]   [72/261]   convivialidad                1
+2026-08-30 12:32:26,372 [INFO]   [77/261]   convivencialidad             0
+2026-08-30 12:32:32,635 [INFO]   [82/261]   convivialism                 94
+2026-08-30 12:32:38,830 [INFO]   [87/261]   convivialite                 176
+2026-08-30 12:32:45,019 [INFO]   [92/261]   conviviale                   317
+2026-08-30 12:32:51,228 [INFO]   [97/261]   convivialisme                6
+2026-08-30 12:32:52,533 [INFO]   [98/261] fila 'teoria de la dependencia': 51 resultados, 7 terminos por medir
+2026-08-30 12:33:00,117 [INFO]   [103/261]   teoria de la dependencia     1
+2026-08-30 12:33:06,372 [INFO]   [108/261]   dependency theory            33
+2026-08-30 12:33:12,514 [INFO]   [113/261]   Dependenztheorie             0
+2026-08-30 12:33:18,767 [INFO]   [118/261]   théorie de la dépendance     39
+2026-08-30 12:33:24,907 [INFO]   [123/261]   teoria dependencia           0
+2026-08-30 12:33:31,157 [INFO]   [128/261]   teoria da dependência        1
+2026-08-30 12:33:37,277 [INFO]   [133/261]   dependentista                0
+2026-08-30 12:33:38,144 [INFO]   [134/261] fila 'buen vivir': 54 resultados, 8 terminos por medir
+2026-08-30 12:33:45,349 [INFO]   [139/261]   buen vivir                   15
+2026-08-30 12:33:51,516 [INFO]   [144/261]   sumak kawsay                 5
+2026-08-30 12:33:57,754 [INFO]   [149/261]   suma qamaña                  1
+2026-08-30 12:34:03,919 [INFO]   [154/261]   sumaq kausay                 0
+2026-08-30 12:34:10,141 [INFO]   [159/261]   buen vivir andino            0
+2026-08-30 12:34:16,348 [INFO]   [164/261]   bien vivre                   33
+2026-08-30 12:34:22,536 [INFO]   [169/261]   gutes Leben                  2
+2026-08-30 12:34:28,722 [INFO]   [174/261]   vivir bien                   4
+2026-08-30 12:34:29,381 [INFO]   [175/261] fila 'pluriverso': 7 resultados, 9 terminos por medir
+2026-08-30 12:34:36,503 [INFO]   [180/261]   pluriverso                   1
+2026-08-30 12:34:42,641 [INFO]   [185/261]   pluriversalidad              0
+2026-08-30 12:34:48,771 [INFO]   [190/261]   pluriversal                  6
+2026-08-30 12:34:54,939 [INFO]   [195/261]   pluriversalism               5
+2026-08-30 12:35:01,099 [INFO]   [200/261]   pluriversalisme              0
+2026-08-30 12:35:07,333 [INFO]   [205/261]   Pluriversum                  0
+2026-08-30 12:35:13,659 [INFO]   [210/261]   pluriverse                   6
+2026-08-30 12:35:19,787 [INFO]   [215/261]   pluriversale                 0
+2026-08-30 12:35:25,924 [INFO]   [220/261]   pluriversalen                0
+2026-08-30 12:35:26,591 [INFO]   [221/261] fila 'quilombo': 7 resultados, 8 terminos por medir
+2026-08-30 12:35:33,766 [INFO]   [226/261]   quilombo                     5
+2026-08-30 12:35:39,909 [INFO]   [231/261]   quilombola                   5
+2026-08-30 12:35:46,038 [INFO]   [236/261]   quilombolas                  5
+2026-08-30 12:35:52,218 [INFO]   [241/261]   território quilombola        0
+2026-08-30 12:35:58,405 [INFO]   [246/261]   quilombos                    4
+2026-08-30 12:36:04,612 [INFO]   [251/261]   terre quilombola             0
+2026-08-30 12:36:10,855 [INFO]   [256/261]   communauté quilombola        1
+2026-08-30 12:36:17,080 [INFO]   [261/261]   Quilombo-Territorium         0
+2026-08-30 12:36:17,083 [WARNING] El sondeo estima hasta 1,307 candidatos, por encima de sondeo.maximo_candidatos (500). Recordar que cada candidato lo revisa una persona.
+2026-08-30 12:36:17,085 [WARNING] 16 terminos superan los umbrales de sondeo. Ver el informe de arriba.
+2026-08-30 12:38:30,922 [INFO] Consulta 1: keyword='decolonial' (12 terminos, tipo=exact)
+2026-08-30 12:38:32,289 [INFO]   totalHits = 694
+2026-08-30 12:38:45,682 [INFO]   recuperados 694, nuevos tras deduplicar 694
+2026-08-30 12:38:46,686 [INFO] Consulta 2: keyword='conviviality' (7 terminos, tipo=exact)
+2026-08-30 12:38:47,445 [INFO]   totalHits = 494
+2026-08-30 12:38:54,866 [INFO]   recuperados 494, nuevos tras deduplicar 491
+2026-08-30 12:38:55,870 [INFO] Consulta 3: keyword='teoria de la dependencia' (7 terminos, tipo=exact)
+2026-08-30 12:38:56,835 [INFO]   totalHits = 51
+2026-08-30 12:38:56,838 [INFO]   recuperados 51, nuevos tras deduplicar 50
+2026-08-30 12:38:57,843 [INFO] Consulta 4: keyword='buen vivir' (8 terminos, tipo=exact)
+2026-08-30 12:38:58,841 [INFO]   totalHits = 54
+2026-08-30 12:38:58,842 [INFO]   recuperados 54, nuevos tras deduplicar 51
+2026-08-30 12:38:59,847 [INFO] Consulta 5: keyword='pluriverso' (9 terminos, tipo=exact)
+2026-08-30 12:39:00,530 [INFO]   totalHits = 7
+2026-08-30 12:39:00,530 [INFO]   recuperados 7, nuevos tras deduplicar 3
+2026-08-30 12:39:01,532 [INFO] Consulta 6: keyword='quilombo' (8 terminos, tipo=exact)
+2026-08-30 12:39:02,403 [INFO]   totalHits = 7
+2026-08-30 12:39:02,406 [INFO]   recuperados 7, nuevos tras deduplicar 5
+2026-08-30 12:39:03,407 [INFO] Candidatos unicos tras deduplicar: 1294
+2026-08-30 12:39:03,407 [INFO] recuperacion.resumenes = true: 1294 llamadas adicionales, una por candidato (~21.6 min a 1.0s de pausa).
+2026-08-30 12:39:33,138 [INFO]   resumenes recuperados: 25/1294
+2026-08-30 12:40:03,883 [INFO]   resumenes recuperados: 50/1294
+2026-08-30 12:40:34,307 [INFO]   resumenes recuperados: 75/1294
+2026-08-30 12:41:04,734 [INFO]   resumenes recuperados: 100/1294
+2026-08-30 12:41:35,157 [INFO]   resumenes recuperados: 125/1294
+2026-08-30 12:42:06,174 [INFO]   resumenes recuperados: 150/1294
+2026-08-30 12:42:36,470 [INFO]   resumenes recuperados: 175/1294
+2026-08-30 12:43:07,292 [INFO]   resumenes recuperados: 200/1294
+2026-08-30 12:43:38,019 [INFO]   resumenes recuperados: 225/1294
+2026-08-30 12:44:08,826 [INFO]   resumenes recuperados: 250/1294
+2026-08-30 12:44:39,282 [INFO]   resumenes recuperados: 275/1294
+2026-08-30 12:45:10,284 [INFO]   resumenes recuperados: 300/1294
+2026-08-30 12:45:40,729 [INFO]   resumenes recuperados: 325/1294
+2026-08-30 12:46:12,716 [INFO]   resumenes recuperados: 350/1294
+2026-08-30 12:46:43,143 [INFO]   resumenes recuperados: 375/1294
+2026-08-30 12:47:13,499 [INFO]   resumenes recuperados: 400/1294
+2026-08-30 12:47:44,192 [INFO]   resumenes recuperados: 425/1294
+2026-08-30 12:48:14,950 [INFO]   resumenes recuperados: 450/1294
+2026-08-30 12:48:45,593 [INFO]   resumenes recuperados: 475/1294
+2026-08-30 12:49:16,075 [INFO]   resumenes recuperados: 500/1294
+2026-08-30 12:49:46,337 [INFO]   resumenes recuperados: 525/1294
+2026-08-30 12:50:47,497 [INFO]   resumenes recuperados: 550/1294
+2026-08-30 12:51:18,678 [INFO]   resumenes recuperados: 575/1294
+2026-08-30 13:00:40,918 [INFO]   resumenes recuperados: 600/1294
+2026-08-30 13:02:23,254 [INFO]   resumenes recuperados: 625/1294
+2026-08-30 13:18:02,956 [INFO]   resumenes recuperados: 650/1294
+2026-08-30 13:21:38,638 [INFO]   resumenes recuperados: 675/1294
+2026-08-30 13:22:09,502 [INFO]   resumenes recuperados: 700/1294
+2026-08-30 13:25:21,760 [INFO]   resumenes recuperados: 725/1294
+2026-08-30 13:25:51,901 [INFO]   resumenes recuperados: 750/1294
+2026-08-30 13:26:21,987 [INFO]   resumenes recuperados: 775/1294
+2026-08-30 13:26:53,084 [INFO]   resumenes recuperados: 800/1294
+2026-08-30 13:27:23,275 [INFO]   resumenes recuperados: 825/1294
+2026-08-30 13:27:53,419 [INFO]   resumenes recuperados: 850/1294
+2026-08-30 13:28:23,512 [INFO]   resumenes recuperados: 875/1294
+2026-08-30 13:28:53,436 [INFO]   resumenes recuperados: 900/1294
+2026-08-30 13:29:23,865 [INFO]   resumenes recuperados: 925/1294
+2026-08-30 13:29:53,930 [INFO]   resumenes recuperados: 950/1294
+2026-08-30 13:30:24,071 [INFO]   resumenes recuperados: 975/1294
+2026-08-30 13:30:54,015 [INFO]   resumenes recuperados: 1000/1294
+2026-08-30 13:31:24,275 [INFO]   resumenes recuperados: 1025/1294
+2026-08-30 13:31:54,267 [INFO]   resumenes recuperados: 1050/1294
+2026-08-30 13:32:24,227 [INFO]   resumenes recuperados: 1075/1294
+2026-08-30 13:32:54,538 [INFO]   resumenes recuperados: 1100/1294
+2026-08-30 13:33:24,888 [INFO]   resumenes recuperados: 1125/1294
+2026-08-30 13:33:55,319 [INFO]   resumenes recuperados: 1150/1294
+2026-08-30 13:34:25,696 [INFO]   resumenes recuperados: 1175/1294
+2026-08-30 13:34:56,169 [INFO]   resumenes recuperados: 1200/1294
+2026-08-30 13:35:26,230 [INFO]   resumenes recuperados: 1225/1294
+2026-08-30 13:35:56,306 [INFO]   resumenes recuperados: 1250/1294
+2026-08-30 13:36:26,426 [INFO]   resumenes recuperados: 1275/1294
+2026-08-30 13:36:50,277 [INFO] Filas: 1294 totales, 0 con anotaciones previas conservadas, 1294 nuevas en esta corrida.
+2026-08-30 13:36:50,317 [INFO] CSV escrito: salidas/WPB_TESIS_001_keywords_S01.csv (1294 filas)
+2026-08-30 13:36:50,390 [INFO] JSON escrito: salidas/WPB_TESIS_001_keywords_S01.json (1294 registros)
+2026-08-30 13:36:50,392 [INFO] Configuracion archivada: salidas/WPB_TESIS_001_keywords_S01_config_usado.yaml
+2026-08-30 13:36:50,392 [INFO] Estadisticas escritas: salidas/WPB_TESIS_001_keywords_S01_estadisticas.txt
+2026-08-30 13:36:50,392 [WARNING] Se escaparon caracteres especiales en 1 terminos del diccionario. Detalle en el reporte de estadisticas.
+2026-08-30 13:36:50,393 [WARNING] Se sanearon separadores en 1745 valores del CSV. El JSON conserva los valores sin alterar.
+2026-08-30 13:36:50,393 [INFO] Fin de la corrida. Siguiente paso: revisar salidas/WPB_TESIS_001_keywords_S01.csv y rellenar las columnas validado, motivo y notas.

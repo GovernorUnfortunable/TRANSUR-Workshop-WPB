@@ -1,0 +1,496 @@
+# =========================================================================
+# WPB_TESIS_S03_analisis.yaml  --  v0.1
+# =========================================================================
+#
+# Configuracion de la etapa S03 del pipeline WPB_TESIS: analisis y
+# visualizacion del corpus de tesis.
+#
+# DOS CAMINOS HASTA AQUI
+#
+#   S01 --> S03              analisis preliminar, sin recuperacion adicional.
+#                            Usa lo que la busqueda ya devuelve. Es el camino
+#                            rapido: sirve para ver la forma del corpus y
+#                            decidir si vale la pena invertir en S02.
+#
+#   S01 --> S02 --> S03      analisis completo. S02 anhade los metadatos que
+#                            la busqueda no trae (langues, accessible,
+#                            cotutelas, codeEtab, mapSujets) y los enlaces de
+#                            acceso al texto.
+#
+#   S03 detecta cual de los dos recibio mirando las columnas del CSV, y omite
+#   los analisis para los que falten datos dejando constancia en el log. No
+#   emite numeros plausibles a partir de columnas ausentes (regla D.6).
+#
+# LA CURACION MANUAL ES OPCIONAL
+#   entrada.modo permite correr sobre los candidatos sin validar. Ver la
+#   advertencia de ese bloque: la curacion cambia lo que miden las metricas
+#   de persistencia, no solo cuantas filas entran.
+#
+# COMO CORRER
+# ───────────
+# Requisitos: Python 3.8+ con pandas, matplotlib, pyyaml, requests
+#             networkx solo si metricas.componente_mayor esta activo
+#
+#   macOS / Linux:
+#     python3 -m pip install pandas matplotlib pyyaml requests
+#     cd /ruta/al/proyecto (completar con la ruta del directorio donde está el proyecto
+#            incluir el nombre completo del directorio entre "", resuelve problemas 
+#            con caracteres extranhos o especiales, como espacios, acentos 
+#            o letras especificas como la enhe - ASCII seguro)
+#     python3 WPB_TESIS_S03_analisis.py --config WPB_TESIS_S03_analisis.yaml
+#
+#   Windows (PowerShell o CMD):
+#     py -m pip install pandas matplotlib pyyaml requests
+#     cd C:\ruta\al\proyecto (completar con la ruta del directorio donde está el proyecto
+#            incluir el nombre completo del directorio entre "", resuelve problemas 
+#            con caracteres extraños o especiales, como espacios, acentos o letras especificas)
+#     py -X utf8 WPB_TESIS_S03_analisis.py --config WPB_TESIS_S03_analisis.yaml
+#
+# Agregar --force para sobrescribir sin pedir confirmación.
+# Usar --csv para apuntar a un CSV de entrada distinto del declarado aquí.
+#
+# -X utf8 en Windows no es opcional: el corpus contiene caracteres franceses
+# y portugueses que cp1252, la codificación local, no representa.
+#
+# LICENCIA DE LOS DATOS
+#   Licence Ouverte / Open Licence 2.0 (Etalab).
+#   Atribucion exigida: "Agence bibliographique de l'enseignement superieur".
+#
+# NOTA SOBRE RUTAS
+#   Barra normal (/) siempre, tambien en Windows: la barra invertida se
+#   interpreta como escape en YAML (regla E.3). Las rutas relativas se
+#   resuelven contra el DIRECTORIO DE TRABAJO, no contra la ubicacion del .py
+#   (regla E.4).
+#
+# =========================================================================
+
+
+# -------------------------------------------------------------------------
+# metadata
+# -------------------------------------------------------------------------
+# A diferencia de BIBLM, no estamos numerando las iteraciones de forma continua, 
+# de S01 a S03. Por eso, el usuario debe ingresar la version (version_config)
+# Se declara en S01 y S03, el script la extrae y usa una expresión regular 
+# del CSV de entrada (regla C.6). Confirma que ambas coincidan. 
+# La idea es que la versión tenga continuidad y que el usuario sepa de esto.
+# El versionamiento ayuda a tener trazabilidad de lo que se ha hecho.
+# 
+
+metadata:
+  version_config: "0.3"     # debe coincidir con la del script (regla D.3)
+  proyecto: "TRANSUR / WPB_TESIS"
+
+
+# -------------------------------------------------------------------------
+# entrada
+# -------------------------------------------------------------------------
+entrada:
+
+  # CSV producido por S01 (camino corto) o por S02 (camino completo).
+  # El flag --csv de la linea de comandos GANA sobre este valor, y el override
+  # se anota en el log y en la copia archivada de la configuracion (A.5).
+  ruta: "salidas/WPB_TESIS_001_keywords_S01.csv"
+
+  # Que filas se analizan.
+  #
+  #   candidatos  todas las filas, con o sin curar. Es el modo del analisis
+  #               preliminar.
+  #   validados   solo las filas cuya columna 'validado' tiene un valor
+  #               afirmativo.
+  #   ambos       calcula las dos cosas y emite la comparacion, para ver que
+  #               descarto la curacion.
+  #
+  # ADVERTENCIA que no es de tamanho de muestra. La curacion cambia lo que
+  # MIDEN las metricas de persistencia, no solo cuantas filas entran. "Ya
+  # habia aparecido antes" es relativo al universo que se analiza: una jurado
+  # que estuvo en tres tesis descartadas y aparece en una validada cuenta como
+  # nueva en modo 'validados' y como recurrente en modo 'candidatos'.
+  # Ninguna lectura es mas correcta; responden preguntas distintas. El informe
+  # declara siempre en que modo corrio.
+  modo: "candidatos"
+
+  # Valores que se aceptan como afirmativos en la columna validado. Se
+  # comparan sin distinguir mayusculas ni espacios sobrantes. Debe coincidir
+  # con curacion.valores_validado_si del YAML de S01.
+  valores_validado_si: ["1", "si", "sí", "s", "x", "yes", "y", "true"]
+
+
+# -------------------------------------------------------------------------
+# temporal
+# -------------------------------------------------------------------------
+temporal:
+
+  # Granularidad de las series.
+  #   anual   un punto por anho. Legible solo si hay varias tesis por anho.
+  #   tramos  agrupa en bloques de tramo_anhos, dependiendo de lo que diga "granularidad"
+  granularidad: "anual" # opciones "anual" o "tramos" 
+  tramo_anhos: 5
+
+  # Recorte del periodo analizado. null = sin recorte.
+  #
+  # ALCANCE: en caso que el usuario lo quiere, se puede recortar el corpus de ANALISIS
+  # se recalculan las métricas en base a lo que queda. 
+  # metricas sobre lo que queda. No es lo mismo que el recorte de S01, que
+  # actua antes de descargar. Y afecta al significado de la persistencia: una
+  # jurado que participo antes del recorte y reaparece dentro cuenta como
+  # nueva, porque su aparicion previa quedo fuera del universo.
+  anho_inicio: null
+  anho_fin: null
+
+  # SESGO CONOCIDO, documentado por Abes: las tesis impresas de las que solo
+  # se conoce el anho se registran como AAAA-01-01. Eso produce una
+  # acumulacion artificial de defensas cada 1 de enero, concentrada en el
+  # material antiguo.
+  # Con true, el informe reporta que proporcion del corpus cae un 1 de enero.
+  # La idea es que esto permita validar la calidad y la granularidad de las fechas.
+  # No corrige nada: solo mide cuanto pesa el artefacto.
+  reportar_sesgo_1_enero: true
+
+
+# -------------------------------------------------------------------------
+# metricas
+# -------------------------------------------------------------------------
+# Que se calcula. Cada metrica se emite por concepto (fila del diccionario,
+# columna keyword_origen del CSV) y para el corpus completo.
+metricas:
+
+  # --- conteos basicos ---
+  n_tesis_anual: true
+  n_tesis_acumulado: true
+  n_personas_distintas: true      # miembros de tribunal distintos, por PPN
+
+  # --- persistencia de tribunales ---
+  # Logica inversa de newcomers_pct de WPB_BIBLM_S02. Para cada periodo:
+  # pregunta que proporcion de los miembros de tribunal de ese periodo YA 
+  # habia aparecido en un periodo anterior del mismo concepto.
+  #
+  # 100 - persistencia = newcomers. Se emite la persistencia porque es lo que
+  # responde la pregunta de quien sostiene una linea tematica en el tiempo.
+  #
+  # El identificador es el PPN. Ver completitud.cobertura_ppn: la metrica solo
+  # cubre a las personas que lo tienen, y esa cobertura NO es aleatoria --
+  # previsiblemente falta mas en material antiguo y en jurados extranjeros.
+  persistencia_tribunal: true
+
+  # Roles que cuentan como "miembro de tribunal" para las metricas de
+  # persistencia y recurrencia. Los cinco son campos independientes del
+  # indice; membresJury NO incluye a los demas, pese a lo que sugiere el
+  # nombre: la documentacion de Abes lo glosa como "examinateurs".
+  #
+  # Los roles pueden solaparse -- en la practica francesa un ponente suele
+  # sentarse en el tribunal -- y no se ha verificado si Abes lo registra en
+  # los dos campos o solo en uno. Por eso se deduplica por PPN dentro de cada
+  # tesis antes de contar.
+  roles_tribunal:
+    directeurs: true
+    president: true
+    rapporteurs: true
+    examinateurs: true
+    auteurs: false          # las autoras no son miembro del tribunal
+
+  # --- rankings ---
+  # Top N de personas mas recurrentes por concepto, en numero de tesis.
+  top_personas: 5
+
+  # Top N de instituciones por concepto.
+  #
+  # ATENCION a que mide: es la institucion DE DEFENSA (etabSoutenancePpn), es
+  # decir donde se defendieron las tesis de ese concepto. NO es la institucion
+  # de los miembros del tribunal, que el registro de la tesis no contiene.
+  # Una profesora de Lyon en un tribunal de Paris aparece bajo Paris si se
+  # confunden las dos cosas.
+  #
+  # La adscripcion real de cada jurado quedaria en IdRef, servicio distinto y
+  # sin verificar. Fuera del alcance de esta version.
+  top_instituciones: 3
+
+  top_disciplinas: 10       # texto libre segun la especificacion TEF: habra
+                            # variantes ortograficas sin agrupar
+                            # NOTA de DESARROLLO (proximas versiones): incorporar 
+                            # embeddings/lemmatizaciones al procesamiento de disciplinas.
+                            # Hace fala conocer mejor qué registra el campo de disciplinas
+
+  # --- solapamiento entre conceptos ---
+  # Tabla de pares: cuantas tesis comparten cada par de conceptos. 
+  solapamiento_conceptos: true
+
+  # --- rendimiento del diccionario ---
+  # Cuantos candidatos aporto cada concepto, y cuantos de ellos unicos.
+  # Retroalimenta el diccionario de S01.
+  rendimiento_conceptos: true
+
+  # --- red de co-participacion en tribunales (periodos) ---
+  # APAGADO POR DEFECTO, y no solo por coste.
+  #
+  # Analoga de largest_component_size_pct de WPB_BIBLM_S02: nodos = personas,
+  # arista = haber estado en el mismo tribunal. Se calcula DENTRO de cada
+  # periodo.
+  #
+  # POR QUE NO SIRVE CON CORPUS PEQUENHOS: el tribunal de una tesis es un
+  # clique completo. Un periodo con una sola tesis da 100% por construccion;
+  # con dos tesis sin jurados compartidos, 50%. En esos casos la metrica mide
+  # cuantas tesis hubo, no estructura de red.
+  #
+  # Encenderla solo con varias decenas de tesis por periodo. Requiere
+  # networkx; si no esta instalado se omite con WARNING (regla F.2).
+  componente_mayor: false
+
+
+  # --- red de co-participacion en tribunales (total) ---
+  # PRENDIDA POR DEFECTO.
+  #
+  # Sobre TODO el periodo, no por periodo. Nodo = miembro de tribunal, por
+  # PPN de persona. Arista = haber estado en el mismo tribunal. Las
+  # comunidades se detectan con Louvain (nx.community.louvain_communities,
+  # disponible en networkx desde la version 2.7).
+  #
+  # No sufre el problema que apago componente_mayor porque acumula todas las
+  # tesis en un solo grafo, en vez de calcular dentro de cada periodo. Pero
+  # el tribunal de cada tesis SIGUE SIENDO un clique completo: si las tesis
+  # casi no comparten jurados, el grafo es un conjunto de cliques disjuntos y
+  # las comunidades reproducen las tesis, no agrupamientos del campo. Ver
+  # red_total_umbral_modularidad.
+  #
+  # Requiere networkx. Si no esta instalado, se omite con WARNING que
+  # explicita que se pierde (regla F.2); el resto del analisis no se afecta.
+  red_total: true
+
+  # Umbral de modularidad por encima del cual la particion se declara poco
+  # informativa, con aviso en el log y en el pie de la figura.
+  #
+  # La modularidad mide cuanto mejor separada esta la particion que lo que
+  # cabria esperar al azar. Un valor cercano a 1 indica componentes casi
+  # disjuntos, que es justo el caso degenerado descrito arriba.
+  #
+  # VALOR PROVISIONAL: 0.85 es conservador y NO esta calibrado contra este
+  # corpus. Ajustarlo cuando se vea la modularidad real de una corrida.
+  red_total_umbral_modularidad: 0.85
+
+  # Tamanho minimo de comunidad para que la figura la etiquete. Las
+  # comunidades por debajo no se etiquetan: con corpus pequenhos hay muchas
+  # de dos o tres personas y la figura queda cubierta de nombres.
+  #
+  # La etiqueta es la PERSONA DE MAYOR GRADO dentro de la comunidad, no del
+  # grafo entero: la etiqueta describe el cluster, no el corpus.
+  red_total_minimo_etiqueta: 3
+
+  # Emitir la red tambien en GEXF, ademas de la figura.
+  # GEXF es el formato que consume Retina (https://retina.cortext.net/,
+  # OuestWare y CNRS CIS), de modo que el archivo se abre ahi sin conversion
+  # previa para explorar la red de forma interactiva. Cuesta una llamada a
+  # nx.write_gexf y no requiere dependencias adicionales.
+  # Los atributos comunidad y grado viajan en el archivo, para que Retina
+  # pueda colorear y dimensionar sin recalcular.
+  red_total_gexf: true
+
+# -------------------------------------------------------------------------
+# completitud
+# -------------------------------------------------------------------------
+# Que tan completos estan los datos. NO mide si theses.fr tiene lagunas --
+# eso depende de que cada institucion haya depositado y no se puede comprobar
+# desde la API. Mide que analisis se pueden hacer sobre ESTE corpus.
+completitud:
+
+  # Proporcion rellena de cada columna, sobre el corpus analizado.
+  por_columna: true
+
+  # Proporcion de miembros de tribunal que traen PPN.
+  # Es el techo de cualquier metrica de persistencia o recurrencia: sin PPN no
+  # hay desambiguacion posible. El campo has_idref existe en la API
+  # precisamente porque hay personas sin identificador estable.
+  cobertura_ppn: true
+
+  # Contradicciones internas: status=soutenue sin NNT (Nro Nac Tesis), fecha de defensa
+  # anterior a la inscripcion del estudiante al programa, tesis sin autor.
+  consistencia: true
+
+  # --- comparacion contra el indice completo ---
+  # Para cada campo, el porcentaje de información en el corpus se compara al mismo
+  # porcentaje en el indice de theses.fr, acotado al mismo status (entregada o no) 
+  # y al mismo rango de anhos.
+  #
+  # POR QUE: un 60% de resumenes no dice lo mismo si el indice esta al 85%
+  # que si esta al 62%. En el primer caso tu corpus esta peor que la media y
+  # hay algo que tratar de entender; en el segundo esta en la media y no hay nada que
+  # corregir. El mismo numero, conclusiones opuestas.
+  #
+  # COSTE: ~10 consultas con sintaxis _exists_, verificada operativa el
+  # 2026-08-29 (ronda 2 del diagnostico).
+  #
+  # LIMITE: _exists_ dice si el campo esta presente, no si el contenido sirve.
+  # Un resumen de diez palabras cuenta igual que uno de mil. Y el rango de
+  # anhos no controla como se distribuye el corpus DENTRO del rango.
+  comparar_con_indice: true
+
+
+# -------------------------------------------------------------------------
+# api
+# -------------------------------------------------------------------------
+# Solo se usa si completitud.comparar_con_indice es true. Todo lo demas se
+# calcula sobre el CSV, sin red.
+api:
+  base_url: "https://theses.fr/api/v1/theses/recherche/"
+
+  # Correo de contacto en el User-Agent. No lo exige la API, pero es una
+  # buena practica en un servicio publico como este. 
+  contacto: "CAMBIAR@POR-TU-CORREO.org"
+
+  pausa_segundos: 1.0
+  timeout_segundos: 30
+  reintentos: 3
+  backoff_factor: 2.0
+
+  # Si las consultas fallan, S03 emite el resto del informe y registra un
+  # WARNING indicando que falta la comparacion (regla F.2). No aborta: el
+  # analisis sobre el CSV no depende de la red.
+
+
+# -------------------------------------------------------------------------
+# visualizacion
+# -------------------------------------------------------------------------
+visualizacion:
+
+  generar_graficos: true
+
+  # Una figura por concepto: barras de tesis por periodo en el eje izquierdo,
+  # lineas de acumulado y porcentajes en el derecho con limite 0-100.
+  # Mismo formato que WPB_BIBLM_S03_visualizaciones.
+  figura_por_concepto: true
+
+  # Figura comparativa con todos los conceptos superpuestos.
+  figura_comparativa: true
+
+  # Paleta. Un color fijo por concepto, el mismo en todas las figuras.
+  # Si hay mas conceptos que colores, la paleta se repite ciclicamente y se
+  # deja constancia en el log.
+  paleta: ["#264653", "#2a9d8f", "#e9c46a", "#f4a261", "#e76f51",
+           "#8ab17d", "#287271", "#efb366"]
+
+  formato: "png"            # png | pdf | svg
+  dpi: 150
+  figura_ancho: 14
+  figura_alto: 6
+
+
+# -------------------------------------------------------------------------
+# output
+# -------------------------------------------------------------------------
+output:
+
+  directorio: "salidas/analisis/"
+
+  # {iter} se extrae del nombre del CSV de entrada, no se declara (regla C.6).
+  patron_nombre: "WPB_TESIS_{iter}_S03"
+
+  # Un CSV por metrica y periodo, para poder rehacer los graficos aparte.
+  exportar_series_csv: true
+
+  # Informe de texto con rankings, completitud y consistencia.
+  exportar_informe: true
+
+  # Sobrescritura: si existen archivos que coinciden con el patron, se listan
+  # y se pide confirmacion (regla C.1). --force la salta y GANA sobre este
+  # valor; el override se anota en el log y en la copia archivada (A.5).
+  # --force se declara en cada invocacion, no se hereda del entorno (C.3).
+  # Sin terminal y sin --force, ABORTA en lugar de esperar (C.2).
+  confirmar_sobrescritura: true
+
+  # S03 NO elimina archivos huerfanos de corridas previas (regla C.4).
+
+
+# -------------------------------------------------------------------------
+# log
+# -------------------------------------------------------------------------
+log:
+  ruta: "salidas/analisis/WPB_TESIS_S03_analisis.log"
+  nivel: "INFO"
+
+  # Copia de este archivo tal como fue leido, junto a los outputs, con el
+  # nombre WPB_TESIS_{iter}_S03_config_usado.yaml (regla D.1). El original se
+  # sigue editando; la copia congela el estado que produjo esos datos.
+  archivar_config: true
+
+  # No hay parametro para desactivar el reporte de exclusiones. Todo filtro
+  # que descarte filas reporta cuantas descarto (regla D.4); un interruptor
+  # para apagarlo contradiria la regla.
+
+
+# =========================================================================
+# NO IMPLEMENTADO
+# =========================================================================
+# Claves conservadas a proposito, con su razon. No las lee el script
+# (regla A.2: toda clave del YAML tiene lectura en el codigo, o esta marcada
+# aqui).
+no_implementado:
+
+  # --- institucion de los miembros del tribunal ---
+  # El registro de la tesis NO la contiene. El indice de personas de
+  # theses.fr expone un campo etablissements, pero es una lista que la propia
+  # API calcula a partir de las tesis en que esa persona participo: no es su
+  # adscripcion declarada. Para una jurado que participa en tribunales de
+  # cinco universidades, ahi habra cinco.
+  # El dato declarado esta en IdRef, servicio distinto sobre el que no se ha
+  # hecho ninguna verificacion. Antes de invertir ahi conviene medir
+  # completitud.cobertura_ppn: sin PPN no hay a quien consultar.
+  institucion_jurado: false
+
+  # --- trayectoria de las personas fuera del corpus ---
+  # /api/v1/personnes/personne/{ppn} devuelve TODAS las tesis de una persona,
+  # no solo las del corpus. Es otro analisis y queda fuera de alcance.
+  trayectoria_personas: false
+
+  # --- TF-IDF ---
+  # Pendiente de decidir en que etapa se calcula. Sobre candidatos sin validar
+  # mezcla lo pertinente con lo que se va a descartar; sobre el corpus
+  # validado mide otra cosa.
+  tfidf: false
+
+  # --- diagrama de Venn del solapamiento ---
+  # A partir de cuatro conjuntos deja de ser legible. Se emite la tabla de
+  # pares en su lugar. Si el diccionario creciera y el solapamiento subiera,
+  # la alternativa legible es un UpSet plot.
+  venn: false
+
+
+# =========================================================================
+# COLUMNAS QUE S03 ESPERA
+# =========================================================================
+# De S01 (camino corto):
+#   diccionario, keyword_origen, nucleo, tipo_busqueda, corrida_origen,
+#   id, nnt (numero nacional de tesis), doi, titrePrincipal, titreEN, discipline, status,
+#   dateSoutenance, datePremiereInscriptionDoctorat,
+#   auteurs, directeurs, president, rapporteurs, examinateurs,
+#   etabSoutenanceN, etabSoutenancePpn, ecolesDoctorale,
+#   partenairesDeRecherche, sujets, sujetsRameau,
+#   resumen, resumen_idioma, validado, motivo, notas
+#
+# De S02 (camino completo), ademas:
+#   langues, accessible, etabCotutelle, codeEtab, mapSujets,
+#   y las columnas de enlaces de acceso.
+#
+# Los campos 1:N conservan la anidacion en un solo campo (regla B.5):
+#   personas       Nom~Prenom~PPN|Nom2~Prenom2~PPN2
+#   instituciones  Nom~PPN~Tipo|...
+#   materias       Libelle~Clave|...
+#   |  separa elementos     ~  une los datos de un mismo elemento
+#
+# Si falta una columna, el analisis que la usa se OMITE con aviso en el log.
+# No se emiten numeros plausibles a partir de columnas ausentes (regla D.6).
+#
+# =========================================================================
+# NOTA SOBRE DATOS PERSONALES
+# =========================================================================
+# Los rankings de personas mas recurrentes son datos personales de personas
+# identificables, y la red de co-participacion revela relaciones que ninguna
+# ficha individual contiene: es informacion NUEVA sobre gente concreta, no una
+# reorganizacion de lo publicado.
+#
+# Abes publica los nombres al amparo del articulo 89.1 del RGPD y no cabe
+# derecho de supresion sobre el registro de tesis defendidas. Eso cubre la
+# fuente, no necesariamente lo que se derive de ella.
+#
+# Sustituir nombres por PPN no anonimiza: el PPN es publico y resoluble en
+# idref.fr.
+#
+# La decision de que sale en un deposito publico se parametriza aparte y no
+# se resuelve en este archivo.
