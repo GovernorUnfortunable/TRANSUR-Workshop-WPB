@@ -61,7 +61,7 @@ Workshop presentation materials.
 
 | Project | Source | License | Attribution |
 |---------|--------|---------|-------------|
-| WPB_BIBLM | [OpenAlex](https://openalex.org) | CC0 | University of Arizona (National Science Foundation grant) |
+| WPB_BIBLM | [OpenAlex](https://openalex.org) | CC0 | OurResearch (nonprofit) |
 | WPB_TESIS | [theses.fr](https://theses.fr/) | Open Licence 2.0 | Agence Bibliographique de l'Enseignement Supérieur (Abes) |
 
 ## Structure & Conventions
