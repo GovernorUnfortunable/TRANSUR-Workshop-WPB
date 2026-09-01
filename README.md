@@ -75,4 +75,4 @@ Workshop presentation materials.
 ## Related Work
 
 - Milia (2026). *Rewiring vs Reconfiguration in mainstream social science.* Figure 10.2 inspired the visualization framework.
-- Aboucaya, W. & Jasim, D. (2026). *Doctoral theses in France (1985–2025): A linked dataset of PhDs, academic networks, and institutions.* Data in Brief, 67. — Complements WPB_TESIS with enriched metadata.
+- Aboucaya, W. & Jasim, D. (2026). *Doctoral theses in France (1985–2025): A linked dataset of PhDs, academic networks, and institutions.* Data in Brief, 67. — Critical to inform WPB_TESIS.
